@@ -1,0 +1,99 @@
+/* @flow */
+
+import React, { Component } from 'react';
+import {
+	Container,
+	Header,
+	Title,
+	Content,
+	Button,
+	Left,
+	Body,
+	Right,
+	Text,
+	Form,
+	Label,
+	Item,
+	Input,
+	Thumbnail,
+} from 'native-base';
+import { ImageEditor, } from 'react-native';
+import FirebaseSvc from '../../assets/services/FirebaseSvc';
+import ImagePicker from 'react-native-image-picker';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+export default class NewUser extends Component {
+  constructor(props) {
+	  super(props);
+	  this.state = {
+			name: '',
+			avatar: '',
+			url: '',
+		};
+	}
+
+	onPressSave = async () => {
+		if(this.state.name!='') {
+			let user = {
+				name: this.state.name,
+			}
+			if(this.state.avatar!='') {
+				await FirebaseSvc.uploadAvatar(this.state.avatar);
+			}
+			await FirebaseSvc.createProfile(user, this.successUpdate());
+		}
+		else {
+			alert("Please Input Your Name");
+		}
+	}
+
+	successUpdate = () => {
+		console.log("User Info Updated");
+		this.props.navigation.navigate("AppDrawerNavigator");
+	}
+
+	onChangeTextName = (name) => {this.setState({name});}
+
+	handleChoosePhoto = () => {
+		const options = {
+			noData: true,
+		};
+		ImagePicker.launchImageLibrary(options, response => {
+			if(response.uri) {
+				// let uploadUrl = FirebaseSvc.uploadAvatar(response);
+				this.setState({ avatar: response });
+			}
+		});
+	}
+
+  render() {
+		const noImg = <Icon name="account-circle" size={80} />;
+		const img = <Thumbnail large source={{uri: this.state.avatar.uri}} />;
+    return (
+      <Container>
+				<Header>
+					<Left>
+					</Left>
+					<Body>
+						<Text>New Account</Text>
+					</Body>
+					<Right>
+						<Button transparent onPress={()=>{this.onPressSave()}}>
+							<Text>Save</Text>
+						</Button>
+					</Right>
+				</Header>
+        <Content>
+					<Form style={{justifyContent: 'center', alignItems: 'center', marginTop: 30}}>
+            {(this.state.avatar!='') ? img : noImg}
+						<Text onPress={this.handleChoosePhoto} style={{color: "#298CFB", marginTop: 10}}>Select Avatar</Text>
+						<Item floatingLabel>
+              <Label>Your Name</Label>
+              <Input onChangeText={(name)=>{this.onChangeTextName(name)}}/>
+            </Item>
+          </Form>
+        </Content>
+      </Container>
+    );
+  }
+}

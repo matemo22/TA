@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "259889041533",
+    "firebase_url": "https://tugasakhir-74ab0.firebaseio.com",
+    "project_id": "tugasakhir-74ab0",
+    "storage_bucket": "tugasakhir-74ab0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259889041533:android:ce2b53874e16621f",
+        "android_client_info": {
+          "package_name": "com.ta"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "259889041533-g5qkhr79fdoievbahdgpkk0ko3sv7i0j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMMJp48R7nmbXuQd5wiCcCA48_gBKIDLM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

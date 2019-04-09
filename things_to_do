@@ -1,0 +1,42 @@
+~/Library/Android/sdk/tools/emulator -list-avds
+~/Library/Android/sdk/tools/emulator -avd Nexus_5X_API_27
+
+onPress={()=>{navigation.push('Chatroom', {
+  title: name,
+ data: data,
+})}}>
+
+calendars
+// <Calendar
+// 	monthFormat = {'MMMM yyyy'}
+// 	hideDayNames = {false}
+// 	onDayPress = {(day)=>this.onDayClick(day)}
+// 	markedDates={dots}
+// 	markingType={'multi-dot'}
+// />
+
+drawer home
+<Drawer
+  ref={(ref) => (this._drawer = ref)}
+  content = {<DrawerMenu navigation={this.props.navigation} />}
+  onClose = {()=>this.closeDrawer()} >
+  <Container>
+    <Header>
+      <Left>
+        <Button transparent onPress={()=>this.openDrawer()}>
+          <Icon name='menu' />
+        </Button>
+      </Left>
+      <Body>
+        <Title>{title}</Title>
+      </Body>
+      <Right>
+      </Right>
+    </Header>
+    <Content>
+      <Button>
+        <Text onPress={()=>{this.logout()}}>Logout</Text>
+      </Button>
+    </Content>
+  </Container>
+</Drawer>
