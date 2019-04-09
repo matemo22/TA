@@ -27,7 +27,8 @@ import {
   H2,
 } from 'native-base';
 import FirebaseSvc from '../services/FirebaseSvc.js';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/AntDesign';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 export default class drawerMenuComponents extends Component {
   constructor(props) {
@@ -46,6 +47,7 @@ export default class drawerMenuComponents extends Component {
       user: null,
       photoURL: '',
       refresh: false,
+      switch: true,
     }
   }
 
@@ -100,6 +102,12 @@ export default class drawerMenuComponents extends Component {
     });
   }
 
+  _toggleGroup = () => {
+    this.setState({
+      switch: !this.state.switch,
+    })
+  }
+
   navigateToScreen = (route) => (
     () => {
       const navigateAction = NavigationActions.navigate({
@@ -125,24 +133,40 @@ export default class drawerMenuComponents extends Component {
   _renderItem = ({item, index}) => {
     let temp = [];
     temp.push(
-      <ListItem key={item.id} style={item.data.chatrooms ? {backgroundColor: '#F0EFF5', marginLeft: 0, borderColor: '#C9C9C9'} : {backgroundColor: '#F0EFF5', marginBottom: 10, borderColor: '#C9C9C9', marginLeft: 0}}>
+      <ListItem
+        key={item.id}
+        onPress={()=>{console.log("Open Dashboard");}}
+        style={item.data.chatrooms ? {backgroundColor: '#F0EFF5', marginLeft: 0, borderColor: '#C9C9C9'} : {backgroundColor: '#F0EFF5', marginBottom: 10, borderColor: '#C9C9C9', marginLeft: 0}}>
         <Left>
           <Text style={{color: '#777777', marginLeft: 16, fontSize: 10, fontFamily: 'System', textTransform: 'uppercase'}}>{item.title}</Text>
         </Left>
         <Right>
-          <Icon name="add" color="#777777" onPress={()=>{this.props.navigation.navigate("CreateChatroom", {id: item.id, doc: item.doc, })}}/>
+          <MaterialIcon name="add" color="#777777" onPress={()=>{this.props.navigation.navigate("CreateChatroom", {id: item.id, doc: item.doc, })}}/>
         </Right>
       </ListItem>
 
     );
     if(item.data.chatrooms) {
       for (var i = 0; i < item.data.chatrooms.length; i++) {
-        temp.push(
-          <ListItem onPress={this.navigateToScreen("Chatroom")} key={item.data.chatrooms[i].cid}>
-            <Icon name="book"/>
-            <Text style={styles.deactiveListItemTextIcon}>{item.data.chatrooms[i].name}</Text>
-          </ListItem>
-        );
+        if(item.data.chatrooms[i].private) {
+          if(item.data.chatrooms[i].members.includes(this.state.user.uid)) {
+            temp.push(
+              <ListItem onPress={this.navigateToScreen("Chatroom")} key={item.data.chatrooms[i].cid}>
+                <Icon name="book"/>
+                <Text style={styles.deactiveListItemTextIcon}>{item.data.chatrooms[i].name}</Text>
+                <Icon name="lock" color="#777777" style={{marginLeft: 3}}/>
+              </ListItem>
+            );
+          }
+        }
+        else {
+          temp.push(
+            <ListItem onPress={this.navigateToScreen("Chatroom")} key={item.data.chatrooms[i].cid}>
+              <Icon name="book"/>
+              <Text style={styles.deactiveListItemTextIcon}>{item.data.chatrooms[i].name}</Text>
+            </ListItem>
+          );
+        }
       }
     }
     return(
@@ -161,8 +185,8 @@ export default class drawerMenuComponents extends Component {
             <Title style={{marginLeft: 5, textAlign: 'left', alignSelf: 'flex-start'}}>SU IMT</Title>
           </Body>
           <Right>
-            <Icon name="add" size={25} style={{marginRight: 10}}/>
-            <Icon name="apps" size={25}/>
+            <Icon name="appstore-o" size={25} style={{marginBottom: -2, marginRight: 3}}/>
+            <MaterialIcon name="more-vert" size={25}/>
           </Right>
         </Header>
         <Content>
@@ -172,7 +196,6 @@ export default class drawerMenuComponents extends Component {
             <Icon name="dashboard" style={(this.state.selectedList=='Dashboard') ? styles.activeListItemIcon : {}}/>
             <Text style={(this.state.selectedList=='Dashboard') ? styles.activeListItemText : styles.deactiveListItemTextIcon}>Dashboard</Text>
           </ListItem>
-
           <FlatList
             data={this.state.category}
             renderItem={this._renderItem}
@@ -184,27 +207,23 @@ export default class drawerMenuComponents extends Component {
             <Text style={{fontSize: 10}}>OTHERS</Text>
           </Separator>
           <ListItem onPress={this.navigateToScreen("Profile")}>
-            <Text>Profile</Text>
+            <Icon name="user"/>
+            <Text style={styles.deactiveListItemTextIcon}>Profile</Text>
           </ListItem>
           <ListItem onPress={this.navigateToScreen("Setting")}>
-            <Text>Setting</Text>
-          </ListItem>
-          <ListItem onPress={this.navigateToScreen("Statistic")}>
-            <Text>Statistic</Text>
-          </ListItem>
-          <ListItem onPress={this.navigateToScreen("Achievement")}>
-            <Text>Achievement</Text>
+            <Icon name="setting"/>
+            <Text style={styles.deactiveListItemTextIcon}>Setting</Text>
           </ListItem>
           <ListItem onPress={()=>{this.logout()}}>
-            <Icon name="settings" />
-            <Text style={{marginLeft: 10}}>Logout</Text>
+            <Icon name="logout" />
+            <Text style={styles.deactiveListItemTextIcon}>Logout</Text>
           </ListItem>
         </Content>
         <Footer>
           <FooterTab>
-            <Button>
-
-              <Icon name="settings"/>
+            <Button onPress={()=>{}}>
+              <Icon name="swap"/>
+              <Text>Switch Group</Text>
             </Button>
           </FooterTab>
         </Footer>

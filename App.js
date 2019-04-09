@@ -279,12 +279,12 @@ const AppDrawerNavigator = createDrawerNavigator({
   Setting: {
     screen: Setting,
   },
-  Statistic: {
-    screen: Statistic,
-  },
-  Achievement: {
-    screen: Achievement,
-  },
+  // Statistic: {
+  //   screen: Statistic,
+  // },
+  // Achievement: {
+  //   screen: Achievement,
+  // },
 }, {
   contentComponent: drawerMenuComponents,
   // mode: Platform.OS === 'ios' ? 'modal' : 'card',

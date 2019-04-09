@@ -95,7 +95,7 @@ export default class CreateChatroom extends Component {
         // });
       })
       .catch(function (e){
-        console.log(e);
+        console.log("Error create Chatroom", e);
       });
     }
   }

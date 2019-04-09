@@ -100,29 +100,29 @@ export default class Chatroom extends Component {
     // console.log("This", this);
     return (
       <Container>
-      <Header>
-        <Left>
-          <Icon
-            style={{marginLeft: 10}}
-            name={"menu"}
-            size={30}
-            color="#298CFB"
-            onPress={()=>{this.props.navigation.dispatch(DrawerActions.toggleDrawer());}}
-          />
-        </Left>
-        <Body stle={{flex: 3}}>
-          <Text>Chatroom</Text>
-        </Body>
-        <Right>
-        </Right>
-      </Header>
-      <GiftedChat
-        messages={this.state.messages}
-        onSend={messages => this.onSend(messages)}
-        user={{
-          _id: 1,
-        }}
-      />
+        <Header>
+          <Left>
+            <Icon
+              style={{marginLeft: 10}}
+              name={"menu"}
+              size={30}
+              color="#298CFB"
+              onPress={()=>{this.props.navigation.dispatch(DrawerActions.toggleDrawer());}}
+            />
+          </Left>
+          <Body stle={{flex: 3}}>
+            <Text>Chatroom</Text>
+          </Body>
+          <Right>
+          </Right>
+        </Header>
+        <GiftedChat
+          messages={this.state.messages}
+          onSend={messages => this.onSend(messages)}
+          user={{
+            _id: 1,
+          }}
+        />
       </Container>
     );
   }
