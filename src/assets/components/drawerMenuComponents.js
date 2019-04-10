@@ -47,13 +47,22 @@ export default class drawerMenuComponents extends Component {
       user: null,
       photoURL: '',
       refresh: false,
-      switch: true,
+      mainDrawer: false,
     }
   }
 
   async componentDidMount() {
-    this.unsubscribeGroup = await this.groupRef.onSnapshot(this.fetchGroup);
-    this.unsubscribeCategory = await this.categoryRef.onSnapshot(this.fetchCategory);
+    let group = await this.retrieveDataGroup();
+    this.retrieveDataMainDrawer();
+    this.unsubscribeGroup = await FirebaseSvc
+      .getGroupRef()
+      .onSnapshot(this.fetchGroup);
+    this.unsubscribeCategory = await FirebaseSvc
+      .getCategoryRef(this.state.selectedGroup.id)
+      .onSnapshot(this.fetchCategory);
+    console.log("ComponentDidMount");
+
+
     var user = FirebaseSvc.getCurrentUser();
     this.setState({
       user,
@@ -65,6 +74,29 @@ export default class drawerMenuComponents extends Component {
 		this.unsubscribeGroup();
     this.unsubscribeCategory();
 	}
+
+  retrieveDataGroup = async () => {
+    try {
+      const selectedGroup = await AsyncStorage.getItem('group');
+      const item = JSON.parse(selectedGroup);
+      console.log("Item", item);
+      if(item) {
+        this.setState({ selectedGroup: item });
+      }
+      return item;
+    }
+    catch(error) {
+      console.log("Error Retrieve Data", error);
+    }
+  }
+
+  retrieveDataMainDrawer = async () => {
+    const mainDrawer = await AsyncStorage.getItem('mainDrawer');
+    console.log("MainDrawer", mainDrawer);
+    if(mainDrawer=='true') {
+      this.setState({ mainDrawer: true });
+    }
+  }
 
   fetchGroup = (querySnapshot) => {
     let groups = [];
@@ -104,8 +136,16 @@ export default class drawerMenuComponents extends Component {
 
   _toggleGroup = () => {
     this.setState({
-      switch: !this.state.switch,
-    })
+      mainDrawer: false,
+      selectedGroup: [],
+      category: [],
+    });
+    this._emptyData();
+    this.unsubscribeCategory();
+  }
+
+  _emptyData = async () => {
+    AsyncStorage.clear();
   }
 
   navigateToScreen = (route) => (
@@ -174,61 +214,157 @@ export default class drawerMenuComponents extends Component {
     )
   }
 
+  selectGroup = async (item) => {
+    await this.setState({
+      selectedGroup: item,
+      mainDrawer: true,
+    });
+    var data = this._storeData(item);
+    var mainDrawer = this._storeDataMainDrawer(true);
+    this.unsubscribeCategory = await FirebaseSvc
+      .getCategoryRef(this.state.selectedGroup.id)
+      .onSnapshot(this.fetchCategory);
+    console.log("User", FirebaseSvc.getCurrentUser());
+  }
+
+  _storeData = async (item) => {
+    try {
+      const getCircularReplacer = () => {
+        const seen = new WeakSet();
+        return (key, value) => {
+          if(typeof value === "object" && value!== null){
+            if(seen.has(value)){
+              return;
+            }
+            seen.add(value);
+          }
+          return value;
+        };
+      };
+      var data = await AsyncStorage.setItem('group', JSON.stringify(item, getCircularReplacer()));
+      return data;
+    }
+    catch(error) {
+      console.log("Error Store Data",error);
+    }
+  }
+
+  _storeDataMainDrawer = async (mainDrawer) => {
+    try {
+      var data = await AsyncStorage.setItem('mainDrawer', JSON.stringify(mainDrawer));
+      return data;
+    }
+    catch(error) {
+      console.log("Error Store Data MainDrawer",error);
+    }
+  }
+
+  _renderGroup = ({item}) => {
+    let temp = [];
+    if(item.data.members.includes(FirebaseSvc.getCurrentUser().uid)) {
+      temp.push(
+        <ListItem
+          onPress={()=>{this.selectGroup(item)}}
+          key={item.id}>
+          <Thumbnail small source={item.data.photoURL ? {uri:item.data.photoURL} : require('../images/icon.png')} />
+          <Text style={styles.deactiveListItemTextIcon, {marginLeft: 5}}>{item.data.name}</Text>
+        </ListItem>
+      );
+    }
+    return(
+      temp
+    )
+  }
+
   render() {
+    const { mainDrawer } = this.state;
+    if(mainDrawer){
+      return (
+        <Container>
+          <Header style={{backgroundColor: '#FFF'}}>
+            <Left></Left>
+            <Body>
+              <Title style={{marginLeft: 5, textAlign: 'left', alignSelf: 'flex-start'}}>{this.state.selectedGroup.doc._data.name}</Title>
+            </Body>
+            <Right>
+              <MaterialIcon name="more-vert" size={25}/>
+            </Right>
+          </Header>
+          <Content>
+            <ListItem
+              onPress={this.navigateToScreen("Home")}
+              style={(this.state.selectedList=='Dashboard') ? styles.activeListItem : {}}>
+              <Icon name="dashboard" style={(this.state.selectedList=='Dashboard') ? styles.activeListItemIcon : {}}/>
+              <Text style={(this.state.selectedList=='Dashboard') ? styles.activeListItemText : styles.deactiveListItemTextIcon}>Dashboard</Text>
+            </ListItem>
+            <FlatList
+              data={this.state.category}
+              renderItem={this._renderItem}
+              extraData={this.state.refresh}
+              keyExtractor={item => item.id}
+            />
+
+            <Separator bordered>
+              <Text style={{fontSize: 10}}>OTHERS</Text>
+            </Separator>
+            <ListItem onPress={this.navigateToScreen("Profile")}>
+              <Icon name="user"/>
+              <Text style={styles.deactiveListItemTextIcon}>Profile</Text>
+            </ListItem>
+            <ListItem onPress={this.navigateToScreen("Setting")}>
+              <Icon name="setting"/>
+              <Text style={styles.deactiveListItemTextIcon}>Setting</Text>
+            </ListItem>
+            <ListItem onPress={()=>{this.logout()}}>
+              <Icon name="logout" />
+              <Text style={styles.deactiveListItemTextIcon}>Logout</Text>
+            </ListItem>
+          </Content>
+          <Footer>
+            <FooterTab>
+              <Button onPress={this._toggleGroup}>
+                <Icon name="swap"/>
+                <Text>Change Group</Text>
+              </Button>
+            </FooterTab>
+          </Footer>
+        </Container>
+      );
+    }
+
     return (
       <Container>
-        <Header style={{backgroundColor: '#FFF'}}>
+        <Header>
           <Left>
-            <Thumbnail small source={this.state.photoURL ? {uri:this.state.photoURL} : require('../images/icon.png')} />
+
           </Left>
           <Body>
-            <Title style={{marginLeft: 5, textAlign: 'left', alignSelf: 'flex-start'}}>SU IMT</Title>
+            <Title style={{marginLeft: 5, textAlign: 'left', alignSelf: 'flex-start'}}>Group</Title>
           </Body>
           <Right>
-            <Icon name="appstore-o" size={25} style={{marginBottom: -2, marginRight: 3}}/>
-            <MaterialIcon name="more-vert" size={25}/>
+
           </Right>
         </Header>
         <Content>
-          <ListItem
-            onPress={this.navigateToScreen("Home")}
-            style={(this.state.selectedList=='Dashboard') ? styles.activeListItem : {}}>
-            <Icon name="dashboard" style={(this.state.selectedList=='Dashboard') ? styles.activeListItemIcon : {}}/>
-            <Text style={(this.state.selectedList=='Dashboard') ? styles.activeListItemText : styles.deactiveListItemTextIcon}>Dashboard</Text>
-          </ListItem>
           <FlatList
-            data={this.state.category}
-            renderItem={this._renderItem}
+            data={this.state.groups}
+            renderItem={this._renderGroup}
             extraData={this.state.refresh}
             keyExtractor={item => item.id}
           />
-
-          <Separator bordered>
-            <Text style={{fontSize: 10}}>OTHERS</Text>
-          </Separator>
-          <ListItem onPress={this.navigateToScreen("Profile")}>
-            <Icon name="user"/>
-            <Text style={styles.deactiveListItemTextIcon}>Profile</Text>
-          </ListItem>
-          <ListItem onPress={this.navigateToScreen("Setting")}>
-            <Icon name="setting"/>
-            <Text style={styles.deactiveListItemTextIcon}>Setting</Text>
-          </ListItem>
-          <ListItem onPress={()=>{this.logout()}}>
-            <Icon name="logout" />
-            <Text style={styles.deactiveListItemTextIcon}>Logout</Text>
-          </ListItem>
         </Content>
         <Footer>
           <FooterTab>
-            <Button onPress={()=>{}}>
-              <Icon name="swap"/>
-              <Text>Switch Group</Text>
+            <Button>
+              <Text>Create Group</Text>
+            </Button>
+            <Button>
+              <Text>Join Group</Text>
             </Button>
           </FooterTab>
         </Footer>
       </Container>
-    );
+    )
   }
 }
 
