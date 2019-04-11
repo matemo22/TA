@@ -5,6 +5,7 @@ class FirebaseSvc {
     this.auth = firebase.auth();
     this.firestore = firebase.firestore();
     this.storage = firebase.storage();
+    this.firestoreBatch = this.firestore.batch();
   }
 
   login = async (user, success_callback, failed_callback) => {
@@ -53,6 +54,50 @@ class FirebaseSvc {
     console.log("User", user);
   }
 
+  getDocument = async (id) => {
+    groupRef = this.firestore.collection('groups').doc(id);
+    return groupRef;
+  }
+
+  createGroup = async (group, response) => {
+    let user = this.auth.currentUser;
+    let members = [];
+    members.push(user.uid);
+    this.firestore.collection("groups").add({
+      name: group.name,
+      photoURL: '',
+      members: members,
+      createdBy: user.uid,
+    })
+    .then(async (docRef) => {
+      if(response) {
+        const metadata = {
+          contentType: response.type,
+        }
+        await this.storage.ref().child('group/'+docRef.id)
+        .putFile(response.uri, metadata)
+        .then(uploadedFile => {
+          console.log("Success Upload Group Avatar", uploadedFile);
+          this.firestoreBatch.update(this.firestore.collection("groups").doc(docRef.id),
+            {photoURL: uploadedFile.downloadURL});
+          this.firestoreBatch.commit()
+          .then(async () => {
+            console.log("Success update group photoURL");
+          })
+          .catch((error) => {
+            console.log("Error Writing Data", error);
+          });
+        })
+        .catch((error) => {
+          console.log("Error Upload Group Avatar", error);
+        });
+      }
+    })
+    .catch(function(error) {
+      console.log("Error Add Group", error);
+    });
+  }
+
   getCurrentUser = () => {
     var user = this.auth.currentUser;
     return user;
@@ -69,8 +114,8 @@ class FirebaseSvc {
     return categoryRef;
   }
 
-  getChatroomRef = (cid) => {
-    var chatroomRef = this.firestore.collection("category").doc(cid).collection("chatrooms");
+  getChatroomRef = (gid) => {
+    var chatroomRef = this.firestore.collection("chatrooms").where('gid', '==', gid);
     return chatroomRef;
   }
 

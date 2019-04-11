@@ -26,7 +26,8 @@ import Login from './src/pages/auth/Login';
 import SignUp from './src/pages/auth/SignUp';
 import NewUser from './src/pages/auth/NewUser';
 import Home from './src/pages/Home';
-
+import Dashboard from './src/pages/Dashboard';
+import CreateGroup from './src/pages/CreateGroup';
 //##TabNavigator
 //->Planner
 import Planner from './src/pages/planner/Planner';
@@ -215,7 +216,23 @@ const HomeTabNavigator = createBottomTabNavigator({
   });
 
 const HomeStackNavigator = createStackNavigator({
-      HomeTabNavigator: HomeTabNavigator,
+      // HomeTabNavigator: HomeTabNavigator,
+      Dashboard: {
+        screen: Dashboard,
+        navigationOptions: ({navigation}) => {
+          return {
+            header: null,
+          }
+        },
+      },
+      CreateGroup: {
+        screen: CreateGroup,
+        navigationOptions: ({navigation}) => {
+          return {
+            header: null,
+          }
+        }
+      }
     }, {
       defaultNavigationOptions: ({navigation}) => {
         return {

@@ -40,3 +40,39 @@ drawer home
     </Content>
   </Container>
 </Drawer>
+
+<ListItem
+  key={item.id}
+  onPress={()=>{console.log("Open Dashboard");}}
+  style={item.data.chatrooms ? {backgroundColor: '#F0EFF5', marginLeft: 0, borderColor: '#C9C9C9'} : {backgroundColor: '#F0EFF5', marginBottom: 10, borderColor: '#C9C9C9', marginLeft: 0}}>
+  <Left>
+    <Text style={{color: '#777777', marginLeft: 16, fontSize: 10, fontFamily: 'System', textTransform: 'uppercase'}}>{item.title}</Text>
+  </Left>
+  <Right>
+    <MaterialIcon name="add" color="#777777" onPress={()=>{this.props.navigation.navigate("CreateChatroom", {id: item.id, doc: item.doc, })}}/>
+  </Right>
+</ListItem>
+
+if(item.data.chatrooms) {
+  for (var i = 0; i < item.data.chatrooms.length; i++) {
+    if(item.data.chatrooms[i].private) {
+      if(item.data.chatrooms[i].members.includes(FirebaseSvc.getCurrentUser().uid)) {
+        temp.push(
+          <ListItem onPress={this.navigateToScreen("Chatroom")} key={item.data.chatrooms[i].cid}>
+            <Icon name="book"/>
+            <Text style={styles.deactiveListItemTextIcon}>{item.data.chatrooms[i].name}</Text>
+            <Icon name="lock" color="#777777" style={{marginLeft: 3}}/>
+          </ListItem>
+        );
+      }
+    }
+    else {
+      temp.push(
+        <ListItem onPress={this.navigateToScreen("Chatroom")} key={item.data.chatrooms[i].cid}>
+          <Icon name="book"/>
+          <Text style={styles.deactiveListItemTextIcon}>{item.data.chatrooms[i].name}</Text>
+        </ListItem>
+      );
+    }
+  }
+}

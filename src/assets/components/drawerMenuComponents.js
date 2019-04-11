@@ -29,19 +29,19 @@ import {
 import FirebaseSvc from '../services/FirebaseSvc.js';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default class drawerMenuComponents extends Component {
   constructor(props) {
     super(props);
     this.unsubscribeGroup=null;
     this.unsubscribeCategory=null;
-
-    this.groupRef = FirebaseSvc.getGroupRef();
-    this.categoryRef = FirebaseSvc.getCategoryRef("JCQ47TKp8wxhOHtpcu6D");
+    this.unsubscribeChatroom=null;
 
     this.state = {
       groups: [],
       category: [],
+      chatroom: [],
       selectedList: '',
       selectedGroup: '',
       user: null,
@@ -60,8 +60,9 @@ export default class drawerMenuComponents extends Component {
     this.unsubscribeCategory = await FirebaseSvc
       .getCategoryRef(this.state.selectedGroup.id)
       .onSnapshot(this.fetchCategory);
-    console.log("ComponentDidMount");
-
+    this.unsubscribeChatroom = await FirebaseSvc
+      .getChatroomRef(this.state.selectedGroup.id)
+      .onSnapshot(this.fetchChatroom);
 
     var user = FirebaseSvc.getCurrentUser();
     this.setState({
@@ -73,6 +74,7 @@ export default class drawerMenuComponents extends Component {
   componentWillUnmount() {
 		this.unsubscribeGroup();
     this.unsubscribeCategory();
+    this.unsubscribeChatroom();
 	}
 
   retrieveDataGroup = async () => {
@@ -92,7 +94,6 @@ export default class drawerMenuComponents extends Component {
 
   retrieveDataMainDrawer = async () => {
     const mainDrawer = await AsyncStorage.getItem('mainDrawer');
-    console.log("MainDrawer", mainDrawer);
     if(mainDrawer=='true') {
       this.setState({ mainDrawer: true });
     }
@@ -134,6 +135,28 @@ export default class drawerMenuComponents extends Component {
     });
   }
 
+  fetchChatroom = (querySnapshot) => {
+    let chatroom = [];
+    querySnapshot.forEach( (doc) => {
+      chatroom.push({
+        doc: doc,
+        data: doc.data(),
+        id: doc.id,
+      });
+    });
+
+    this.setState({
+      chatroom: chatroom,
+      refresh: !this.state.refresh,
+    });
+  }
+
+  returnData() {
+    this.setState({
+      refresh: !this.state.refresh
+    });
+  }
+
   _toggleGroup = () => {
     this.setState({
       mainDrawer: false,
@@ -142,6 +165,7 @@ export default class drawerMenuComponents extends Component {
     });
     this._emptyData();
     this.unsubscribeCategory();
+    this.unsubscribeChatroom();
   }
 
   _emptyData = async () => {
@@ -170,13 +194,33 @@ export default class drawerMenuComponents extends Component {
     alert("Logout Failed");
   }
 
+  _renderItem2 = ({item}) => {
+    let temp = [];
+    if(!item.data.cid) {
+      temp.push(
+        <ListItem onPress={this.navigateToScreen("Chatroom")} key={item.id}>
+          <Icon name="book"/>
+          <Text style={styles.deactiveListItemTextIcon}>{item.data.name}</Text>
+        </ListItem>
+      )
+    }
+    return (
+      temp
+    )
+  }
+
   _renderItem = ({item, index}) => {
     let temp = [];
+    let chatroom = this.state.chatroom;
     temp.push(
       <ListItem
         key={item.id}
         onPress={()=>{console.log("Open Dashboard");}}
-        style={item.data.chatrooms ? {backgroundColor: '#F0EFF5', marginLeft: 0, borderColor: '#C9C9C9'} : {backgroundColor: '#F0EFF5', marginBottom: 10, borderColor: '#C9C9C9', marginLeft: 0}}>
+        style={chatroom.some(a=>a.data.cid === item.id) ?
+          {backgroundColor: '#F0EFF5', marginLeft: 0, borderColor: '#C9C9C9'}
+          :
+          {backgroundColor: '#F0EFF5', marginBottom: 10, borderColor: '#C9C9C9', marginLeft: 0}
+        }>
         <Left>
           <Text style={{color: '#777777', marginLeft: 16, fontSize: 10, fontFamily: 'System', textTransform: 'uppercase'}}>{item.title}</Text>
         </Left>
@@ -184,28 +228,29 @@ export default class drawerMenuComponents extends Component {
           <MaterialIcon name="add" color="#777777" onPress={()=>{this.props.navigation.navigate("CreateChatroom", {id: item.id, doc: item.doc, })}}/>
         </Right>
       </ListItem>
-
     );
-    if(item.data.chatrooms) {
-      for (var i = 0; i < item.data.chatrooms.length; i++) {
-        if(item.data.chatrooms[i].private) {
-          if(item.data.chatrooms[i].members.includes(this.state.user.uid)) {
+    if(chatroom.some(a=>a.data.cid === item.id)) {
+      for (var i = 0; i < chatroom.length; i++) {
+        if(chatroom[i].data.cid==item.id){
+          if(chatroom[i].data.private) {
+            if(chatroom[i].data.members.includes(FirebaseSvc.getCurrentUser().uid)) {
+              temp.push(
+                <ListItem onPress={this.navigateToScreen("Chatroom")} key={chatroom[i].id}>
+                  <Icon name="book"/>
+                  <Text style={styles.deactiveListItemTextIcon}>{chatroom[i].data.name}</Text>
+                  <Icon name="lock" color="#777777" style={{marginLeft: 3}}/>
+                </ListItem>
+              );
+            }
+          }
+          else {
             temp.push(
-              <ListItem onPress={this.navigateToScreen("Chatroom")} key={item.data.chatrooms[i].cid}>
+              <ListItem onPress={this.navigateToScreen("Chatroom")} key={chatroom[i].id}>
                 <Icon name="book"/>
-                <Text style={styles.deactiveListItemTextIcon}>{item.data.chatrooms[i].name}</Text>
-                <Icon name="lock" color="#777777" style={{marginLeft: 3}}/>
+                <Text style={styles.deactiveListItemTextIcon}>{chatroom[i].data.name}</Text>
               </ListItem>
             );
           }
-        }
-        else {
-          temp.push(
-            <ListItem onPress={this.navigateToScreen("Chatroom")} key={item.data.chatrooms[i].cid}>
-              <Icon name="book"/>
-              <Text style={styles.deactiveListItemTextIcon}>{item.data.chatrooms[i].name}</Text>
-            </ListItem>
-          );
         }
       }
     }
@@ -224,7 +269,9 @@ export default class drawerMenuComponents extends Component {
     this.unsubscribeCategory = await FirebaseSvc
       .getCategoryRef(this.state.selectedGroup.id)
       .onSnapshot(this.fetchCategory);
-    console.log("User", FirebaseSvc.getCurrentUser());
+    this.unsubscribeChatroom = await FirebaseSvc
+      .getChatroomRef(this.state.selectedGroup.id)
+      .onSnapshot(this.fetchChatroom);
   }
 
   _storeData = async (item) => {
@@ -278,6 +325,18 @@ export default class drawerMenuComponents extends Component {
 
   render() {
     const { mainDrawer } = this.state;
+    var settingIcon = <Icon name="setting"/>
+    var fileTreeIcon = <MaterialCommunityIcon name="file-tree" />
+    var chatroomIcon = <Icon name="book"/>
+    var cancelIcon = <Icon name="close"/>
+    var BUTTONS = [
+      {text: "Setting", icon: settingIcon},
+      {text: "Create Category", icon: fileTreeIcon},
+      {text: "Create Chatroom", icon: chatroomIcon},
+      {text: "Close", icon: cancelIcon}
+    ];
+    var CANCEL_INDEX = 3;
+
     if(mainDrawer){
       return (
         <Container>
@@ -287,7 +346,27 @@ export default class drawerMenuComponents extends Component {
               <Title style={{marginLeft: 5, textAlign: 'left', alignSelf: 'flex-start'}}>{this.state.selectedGroup.doc._data.name}</Title>
             </Body>
             <Right>
-              <MaterialIcon name="more-vert" size={25}/>
+              <MaterialIcon
+                name="more-vert"
+                size={25}
+                onPress={()=>
+                  ActionSheet.show({
+                    options: BUTTONS,
+                    cancelButtonIndex: CANCEL_INDEX,
+                  },
+                  buttonIndex => {
+                    if(buttonIndex==0) {
+                      console.log("Setting");
+                    }
+                    else if(buttonIndex==1) {
+                      console.log("Create Category");
+                    }
+                    else if(buttonIndex==2) {
+                      console.log("Create Chatroom");
+                    }
+                  })
+                }
+              />
             </Right>
           </Header>
           <Content>
@@ -297,6 +376,12 @@ export default class drawerMenuComponents extends Component {
               <Icon name="dashboard" style={(this.state.selectedList=='Dashboard') ? styles.activeListItemIcon : {}}/>
               <Text style={(this.state.selectedList=='Dashboard') ? styles.activeListItemText : styles.deactiveListItemTextIcon}>Dashboard</Text>
             </ListItem>
+            <FlatList
+              data={this.state.chatroom}
+              renderItem={this._renderItem2}
+              extraData={this.state.refresh}
+              keyExtractor={item=>item.id}
+            />
             <FlatList
               data={this.state.category}
               renderItem={this._renderItem}
@@ -332,6 +417,7 @@ export default class drawerMenuComponents extends Component {
       );
     }
 
+    //If Not Select Group
     return (
       <Container>
         <Header>
@@ -355,7 +441,9 @@ export default class drawerMenuComponents extends Component {
         </Content>
         <Footer>
           <FooterTab>
-            <Button>
+            <Button onPress={()=>{this.props.navigation.navigate("CreateGroup", {
+              returnData: this.returnData.bind(this),
+            })}}>
               <Text>Create Group</Text>
             </Button>
             <Button>
