@@ -76,3 +76,5 @@ if(item.data.chatrooms) {
     }
   }
 }
+
+<Text>{this.state.group ? this.state.group._data.name : "Name"}</Text>

@@ -54,11 +54,6 @@ class FirebaseSvc {
     console.log("User", user);
   }
 
-  getDocument = async (id) => {
-    groupRef = this.firestore.collection('groups').doc(id);
-    return groupRef;
-  }
-
   createGroup = async (group, response) => {
     let user = this.auth.currentUser;
     let members = [];
@@ -98,6 +93,18 @@ class FirebaseSvc {
     });
   }
 
+  editGroup = (group) => {
+    this.firestoreBatch.update(this.firestore.collection("groups").doc(group.id),
+      {photoURL: group.photoURL, name: group.name});
+    this.firestoreBatch.commit()
+    .then(async () => {
+      console.log("Success update group info");
+    })
+    .catch((error) => {
+      console.log("Error Writing Data", error);
+    });
+  }
+
   getCurrentUser = () => {
     var user = this.auth.currentUser;
     return user;
@@ -106,6 +113,11 @@ class FirebaseSvc {
   getGroupRef = () => {
     var user = this.auth.currentUser;
     var groupRef = this.firestore.collection("groups").where('members','array-contains',user.uid);
+    return groupRef;
+  }
+
+  getGroupRefById = (id) => {
+    groupRef = this.firestore.collection('groups').doc(id);
     return groupRef;
   }
 

@@ -1,7 +1,7 @@
 /* @flow */
 
 import React, { Component } from 'react';
-import { NavigationActions, SafeAreaView } from 'react-navigation';
+import { NavigationActions, SafeAreaView, StackActions } from 'react-navigation';
 import { ScrollView, AsyncStorage, View, StyleSheet, FlatList, SectionList } from 'react-native';
 import {
   Container,
@@ -81,7 +81,7 @@ export default class drawerMenuComponents extends Component {
     try {
       const selectedGroup = await AsyncStorage.getItem('group');
       const item = JSON.parse(selectedGroup);
-      console.log("Item", item);
+      // console.log("Item", item);
       if(item) {
         this.setState({ selectedGroup: item });
       }
@@ -179,7 +179,17 @@ export default class drawerMenuComponents extends Component {
       });
       this.props.navigation.dispatch(navigateAction);
     }
-  )
+  );
+
+  // navigateToChatroom = (route) => (
+  //   () => {
+  //     const resetAction = StackActions.reset({
+  //       index: 0,
+  //       actions: [NavigationActions.navigate({ routeName: 'Chatroom' })],
+  //     });
+  //     this.props.navigation.dispatch(resetAction);
+  //   }
+  // )
 
   logout = async () => {
     await FirebaseSvc.logout(this.logoutSuccess, this.logoutFailed);
@@ -323,6 +333,20 @@ export default class drawerMenuComponents extends Component {
     )
   }
 
+  _actionSheetClick = (buttonIndex) => {
+    if(buttonIndex==0) {
+      this.props.navigation.navigate("Setting", {
+        group: this.state.selectedGroup
+      });
+    }
+    else if(buttonIndex==1) {
+      console.log("Create Category");
+    }
+    else if(buttonIndex==2) {
+      console.log("Create Chatroom");
+    }
+  }
+
   render() {
     const { mainDrawer } = this.state;
     var settingIcon = <Icon name="setting"/>
@@ -353,17 +377,7 @@ export default class drawerMenuComponents extends Component {
                   ActionSheet.show({
                     options: BUTTONS,
                     cancelButtonIndex: CANCEL_INDEX,
-                  },
-                  buttonIndex => {
-                    if(buttonIndex==0) {
-                      console.log("Setting");
-                    }
-                    else if(buttonIndex==1) {
-                      console.log("Create Category");
-                    }
-                    else if(buttonIndex==2) {
-                      console.log("Create Chatroom");
-                    }
+                  }, (buttonIndex)=>{this._actionSheetClick(buttonIndex)
                   })
                 }
               />

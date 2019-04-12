@@ -58,6 +58,7 @@ import Chatroom from './src/pages/chatroom/Chatroom';
 import CreateChatroom from './src/pages/chatroom/CreateChatroom';
 import Profile from './src/pages/drawer/Profile';
 import Setting from './src/pages/drawer/Setting';
+import EditGroup from './src/pages/drawer/EditGroup';
 //->Statistic
 import Statistic from './src/pages/drawer/Statistic';
 //->Achievement
@@ -232,7 +233,7 @@ const HomeStackNavigator = createStackNavigator({
             header: null,
           }
         }
-      }
+      },
     }, {
       defaultNavigationOptions: ({navigation}) => {
         return {
@@ -243,6 +244,7 @@ const HomeStackNavigator = createStackNavigator({
               onPress={()=>{navigation.dispatch(DrawerActions.toggleDrawer());}}
             />
           ),
+          gesturesEnabled: false,
         }
       }
     }
@@ -252,7 +254,6 @@ const ChatroomStackNavigator = createStackNavigator({
   Chatroom: {
     screen: Chatroom,
   },
-
 }, {
   defaultNavigationOptions: ({navigation}) => {
     return {
@@ -279,10 +280,34 @@ const ProfileStackNavigator = createStackNavigator({
   }
 });
 
+const SettingStackNavigator = createStackNavigator({
+  Setting: {
+    screen: Setting,
+  },
+  EditGroup: {
+    screen: EditGroup,
+  },
+}, {
+  defaultNavigationOptions: ({navigation}) => {
+    return {
+      header: null
+    }
+  }
+});
+
 //Ubah Custom Drawer
 const AppDrawerNavigator = createDrawerNavigator({
   Home: {
     screen: HomeStackNavigator,
+  },
+  // Setting: {
+  //   screen: Setting,
+  // },
+  // EditGroup: {
+  //   screen: EditGroup,
+  // },
+  Setting: {
+    screen: SettingStackNavigator,
   },
   Chatroom: {
     screen: ChatroomStackNavigator,
@@ -292,9 +317,6 @@ const AppDrawerNavigator = createDrawerNavigator({
   },
   Profile: {
     screen: ProfileStackNavigator,
-  },
-  Setting: {
-    screen: Setting,
   },
   // Statistic: {
   //   screen: Statistic,
