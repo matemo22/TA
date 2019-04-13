@@ -118,6 +118,16 @@ export default class drawerMenuComponents extends Component {
     });
   }
 
+  _storeGroupData = async (items) => {
+    try {
+      var data = await AsyncStorage.setItem('groups', JSON.stringify(item));
+      return data;
+    }
+    catch(error) {
+      console.log("Error Store Data",error);
+    }
+  }
+
   fetchCategory = (querySnapshot) => {
     let category = [];
     querySnapshot.forEach( (doc) => {

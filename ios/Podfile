@@ -11,9 +11,11 @@ target 'TA' do
   pod 'Firebase/Auth', '~> 5.15.0'
   pod 'Firebase/Firestore', '~> 5.15.0'
   pod 'Firebase/Storage', '~> 5.15.0'
+  pod 'Firebase/Functions', '~> 5.15.0'
+  pod 'Firebase/Messaging', '~> 5.15.0'
   pod 'React', :path => '../node_modules/react-native'
   pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
-  
+
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
   pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'

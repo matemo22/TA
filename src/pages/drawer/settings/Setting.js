@@ -21,7 +21,7 @@ import {
   Thumbnail,
   Drawer,
 } from 'native-base';
-import FirebaseSvc from '../../assets/services/FirebaseSvc';
+import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 
 export default class Setting extends Component {
@@ -93,7 +93,7 @@ export default class Setting extends Component {
         </Header>
         <Content bounces={false}>
           <View style={{backgroundColor: "#F8F8F8", justifyContent: 'center', alignItems: 'center'}}>
-            <Thumbnail large source={this.state.doc ? {uri: this.state.doc._data.photoURL} : require('../../assets/images/icon.png')} />
+            <Thumbnail large source={this.state.doc ? {uri: this.state.doc._data.photoURL} : require('../../../assets/images/icon.png')} />
             <Text style={{marginTop: 20, fontSize: 20}}>{this.state.doc ? this.state.doc._data.name : "Group Name"}</Text>
           </View>
 
@@ -112,7 +112,7 @@ export default class Setting extends Component {
 
               </Right>
             </ListItem>
-            <ListItem icon onPress={()=>{console.log("Category");}}>
+            <ListItem icon onPress={()=>{this.props.navigation.navigate("Category", {group: this.state.group})}}>
               <Left>
                 <Icon name="book"/>
               </Left>

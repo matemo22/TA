@@ -21,7 +21,7 @@ import {
   Thumbnail,
   Drawer,
 } from 'native-base';
-import FirebaseSvc from '../../assets/services/FirebaseSvc';
+import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
@@ -50,8 +50,11 @@ export default class EditGroup extends Component {
 	}
 
   saveEdit = () => {
+    let newGroup = {};
     if(this.state.nameEdited && this.state.photoEdited) {
-      
+      newGroup.name = this.state.name;
+      newGroup.photoURL = this.state.avatar;
+      newGroup.id = this.group.id;
     }
     else if(this.state.nameEdited) {
 
