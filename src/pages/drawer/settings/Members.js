@@ -24,39 +24,21 @@ import {
 import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-export default class Category extends Component {
+export default class Members extends Component {
   constructor(props){
     super(props);
-    this.unsubscribeCategory = null;
-    this.unsubscribeChatroom = null;
-    this.unsubscribeRole = null;
+    this.unsubscribe = null;
     this.group = this.props.navigation.getParam('group', []);
 
     this.state = {
       group: '',
       doc: '',
       refresh: false,
-      chatroom: [],
-      category: [],
-      role: [],
+      members: [],
     };
   }
 
-  retrieveData = async () => {
-    try {
-      const categories = await AsyncStorage.getItem('categories');
-      const category = await JSON.parse(categories);
-      const chatrooms = await AsyncStorage.getItem('chatrooms');
-      const chatroom = await JSON.parse(chatrooms);
-      await this.setState({ category: category, chatroom: chatroom });
-      return item;
-    }
-    catch(error) {
-      console.log("Error Retrieve Data", error);
-    }
-  }
-
-  fetchCategory = (querySnapshot) => {
+  fetchUser = (querySnapshot) => {
     let category = [];
     querySnapshot.forEach( (doc) => {
       category.push({

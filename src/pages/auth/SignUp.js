@@ -53,6 +53,7 @@ export default class SignUp extends Component {
 
 	createSuccess = () => {
 		console.log("Create New Account Successful, navigate to Update Profile.");
+		FirebaseSvc.createUser();
 		this.props.navigation.navigate("NewUser");
 	}
 

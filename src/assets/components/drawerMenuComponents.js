@@ -37,11 +37,13 @@ export default class drawerMenuComponents extends Component {
     this.unsubscribeGroup=null;
     this.unsubscribeCategory=null;
     this.unsubscribeChatroom=null;
+    this.unsubscribeRole=null;
 
     this.state = {
       groups: [],
       category: [],
       chatroom: [],
+      role: [],
       selectedList: '',
       selectedGroup: '',
       user: null,
@@ -63,8 +65,11 @@ export default class drawerMenuComponents extends Component {
     this.unsubscribeChatroom = await FirebaseSvc
       .getChatroomRef(this.state.selectedGroup.id)
       .onSnapshot(this.fetchChatroom);
-
+    this.unsubscribeRole = await FirebaseSvc
+      .getRoleRef(this.state.selectedGroup.id)
+      .onSnapshot(this.fetchRole);
     var user = FirebaseSvc.getCurrentUser();
+    console.log("User", user);
     this.setState({
       user,
       photoURL: user.photoURL,
@@ -75,6 +80,7 @@ export default class drawerMenuComponents extends Component {
 		this.unsubscribeGroup();
     this.unsubscribeCategory();
     this.unsubscribeChatroom();
+    this.unsubscribeRole();
 	}
 
   retrieveDataGroup = async () => {
@@ -99,7 +105,7 @@ export default class drawerMenuComponents extends Component {
     }
   }
 
-  fetchGroup = (querySnapshot) => {
+  fetchGroup = async (querySnapshot) => {
     let groups = [];
     let selectedGroup = this.state.selectedGroup;
     querySnapshot.forEach( (doc) => {
@@ -107,9 +113,11 @@ export default class drawerMenuComponents extends Component {
       groups.push({
         doc: doc,
         data: doc.data(),
-        id: doc.id
+        id: doc.id,
       });
     });
+
+    // this._storeGroupData(groups);
 
     this.setState({
       groups: groups,
@@ -118,13 +126,15 @@ export default class drawerMenuComponents extends Component {
     });
   }
 
-  _storeGroupData = async (items) => {
+  _storeGroupData = async (item) => {
     try {
+      console.log("Data", item);
+      console.log("stringify", JSON.stringify(item));
       var data = await AsyncStorage.setItem('groups', JSON.stringify(item));
       return data;
     }
     catch(error) {
-      console.log("Error Store Data",error);
+      console.log("Error Store Data Groups",error);
     }
   }
 
@@ -139,10 +149,22 @@ export default class drawerMenuComponents extends Component {
       });
     });
 
+    // this._storeCategoryData(category);
+
     this.setState({
       category: category,
       refresh: !this.state.refresh,
     });
+  }
+
+  _storeCategoryData = async (item) => {
+    try {
+      var data = await AsyncStorage.setItem('categories', JSON.stringify(item));
+      return data;
+    }
+    catch(error) {
+      console.log("Error Store Data Categories",error);
+    }
   }
 
   fetchChatroom = (querySnapshot) => {
@@ -155,8 +177,40 @@ export default class drawerMenuComponents extends Component {
       });
     });
 
+    // this._storeChatroomsData(chatroom);
+
     this.setState({
       chatroom: chatroom,
+      refresh: !this.state.refresh,
+    });
+  }
+
+  _storeChatroomsData = async (item) => {
+    try {
+      var data = await AsyncStorage.setItem('chatrooms', JSON.stringify(item));
+      return data;
+    }
+    catch(error) {
+      console.log("Error Store Data Chatrooms",error);
+    }
+  }
+
+  fetchRole = (querySnapshot) => {
+    let role = [];
+    querySnapshot.forEach( (doc) => {
+      if(doc.data().members && doc.data().members.includes(FirebaseSvc.getCurrentUser().uid)){
+        role.push({
+          doc: doc,
+          data: doc.data(),
+          id: doc.id,
+        });
+      }
+    });
+
+    // this._storeChatroomsData(chatroom);
+
+    this.setState({
+      role: role,
       refresh: !this.state.refresh,
     });
   }
@@ -176,6 +230,7 @@ export default class drawerMenuComponents extends Component {
     this._emptyData();
     this.unsubscribeCategory();
     this.unsubscribeChatroom();
+    this.unsubscribeRole();
   }
 
   _emptyData = async () => {
@@ -207,6 +262,11 @@ export default class drawerMenuComponents extends Component {
 
   logoutSuccess = () => {
     console.log("Logout Successful. Navigate to AuthTabs");
+    this._emptyData();
+    this.unsubscribeGroup();
+    this.unsubscribeCategory();
+    this.unsubscribeChatroom();
+    this.unsubscribeRole();
     this.props.navigation.navigate("AuthTabs");
   }
 
@@ -232,48 +292,88 @@ export default class drawerMenuComponents extends Component {
   _renderItem = ({item, index}) => {
     let temp = [];
     let chatroom = this.state.chatroom;
-    temp.push(
-      <ListItem
-        key={item.id}
-        onPress={()=>{console.log("Open Dashboard");}}
-        style={chatroom.some(a=>a.data.cid === item.id) ?
-          {backgroundColor: '#F0EFF5', marginLeft: 0, borderColor: '#C9C9C9'}
-          :
-          {backgroundColor: '#F0EFF5', marginBottom: 10, borderColor: '#C9C9C9', marginLeft: 0}
-        }>
-        <Left>
-          <Text style={{color: '#777777', marginLeft: 16, fontSize: 10, fontFamily: 'System', textTransform: 'uppercase'}}>{item.title}</Text>
-        </Left>
-        <Right>
-          <MaterialIcon name="add" color="#777777" onPress={()=>{this.props.navigation.navigate("CreateChatroom", {id: item.id, doc: item.doc, })}}/>
-        </Right>
-      </ListItem>
-    );
-    if(chatroom.some(a=>a.data.cid === item.id)) {
-      for (var i = 0; i < chatroom.length; i++) {
-        if(chatroom[i].data.cid==item.id){
-          if(chatroom[i].data.private) {
-            if(chatroom[i].data.members.includes(FirebaseSvc.getCurrentUser().uid)) {
+    let role = this.state.role;
+    if(item.data.private) {
+      if(role.some(r=>item.data.roles.includes(r.id))) {
+        temp.push(
+          <ListItem
+            key={item.id}
+            onPress={()=>{console.log("Open Dashboard");}}
+            style={chatroom.some(a=>a.data.cid === item.id) ?
+              {backgroundColor: '#F0EFF5', marginLeft: 0, borderColor: '#C9C9C9'}
+              :
+              {backgroundColor: '#F0EFF5', marginBottom: 10, borderColor: '#C9C9C9', marginLeft: 0}
+            }>
+            <Left>
+              <View style={{flexDirection: 'row'}}>
+                <Text style={{color: '#777777', marginLeft: 16, fontSize: 10, fontFamily: 'System', textTransform: 'uppercase'}}>{item.title}</Text>
+                <Icon color="#777777" name="lock" style={{marginRight: 15}}/>
+              </View>
+            </Left>
+            <Right>
+              <MaterialIcon name="add" color="#777777" onPress={()=>{this.props.navigation.navigate("CreateChatroom", {id: item.id, doc: item.doc, })}}/>
+            </Right>
+          </ListItem>
+        );
+        if(chatroom.some(a=>a.data.cid === item.id)) {
+          for (var i = 0; i < chatroom.length; i++) {
+            if(chatroom[i].data.cid==item.id){
               temp.push(
                 <ListItem onPress={this.navigateToScreen("Chatroom")} key={chatroom[i].id}>
                   <Icon name="book"/>
                   <Text style={styles.deactiveListItemTextIcon}>{chatroom[i].data.name}</Text>
-                  <Icon name="lock" color="#777777" style={{marginLeft: 3}}/>
                 </ListItem>
               );
             }
           }
-          else {
-            temp.push(
-              <ListItem onPress={this.navigateToScreen("Chatroom")} key={chatroom[i].id}>
-                <Icon name="book"/>
-                <Text style={styles.deactiveListItemTextIcon}>{chatroom[i].data.name}</Text>
-              </ListItem>
-            );
+        }
+      }
+    }
+    else {
+      temp.push(
+        <ListItem
+          key={item.id}
+          onPress={()=>{console.log("Open Dashboard");}}
+          style={chatroom.some(a=>a.data.cid === item.id) ?
+            {backgroundColor: '#F0EFF5', marginLeft: 0, borderColor: '#C9C9C9'}
+            :
+            {backgroundColor: '#F0EFF5', marginBottom: 10, borderColor: '#C9C9C9', marginLeft: 0}
+          }>
+          <Left>
+            <Text style={{color: '#777777', marginLeft: 16, fontSize: 10, fontFamily: 'System', textTransform: 'uppercase'}}>{item.title}</Text>
+          </Left>
+          <Right>
+            <MaterialIcon name="add" color="#777777" onPress={()=>{this.props.navigation.navigate("CreateChatroom", {id: item.id, doc: item.doc, })}}/>
+          </Right>
+        </ListItem>
+      );
+      if(chatroom.some(a=>a.data.cid === item.id)) {
+        for (var i = 0; i < chatroom.length; i++) {
+          if(chatroom[i].data.cid==item.id){
+            if(chatroom[i].data.private) {
+              if(role.some(r=>chatroom[i].data.roles.includes(r.id))) {
+                temp.push(
+                  <ListItem onPress={this.navigateToScreen("Chatroom")} key={chatroom[i].id}>
+                    <Icon name="book"/>
+                    <Text style={styles.deactiveListItemTextIcon}>{chatroom[i].data.name}</Text>
+                    <Icon name="lock" color="#777777" style={{marginLeft: 3}}/>
+                  </ListItem>
+                );
+              }
+            }
+            else {
+              temp.push(
+                <ListItem onPress={this.navigateToScreen("Chatroom")} key={chatroom[i].id}>
+                  <Icon name="book"/>
+                  <Text style={styles.deactiveListItemTextIcon}>{chatroom[i].data.name}</Text>
+                </ListItem>
+              );
+            }
           }
         }
       }
     }
+
     return(
       temp
     )
@@ -292,6 +392,9 @@ export default class drawerMenuComponents extends Component {
     this.unsubscribeChatroom = await FirebaseSvc
       .getChatroomRef(this.state.selectedGroup.id)
       .onSnapshot(this.fetchChatroom);
+    this.unsubscribeRole = await FirebaseSvc
+      .getRoleRef(this.state.selectedGroup.id)
+      .onSnapshot(this.fetchRole);
   }
 
   _storeData = async (item) => {
@@ -462,6 +565,10 @@ export default class drawerMenuComponents extends Component {
             extraData={this.state.refresh}
             keyExtractor={item => item.id}
           />
+          <ListItem onPress={()=>{this.logout()}}>
+            <Icon name="logout" />
+            <Text style={styles.deactiveListItemTextIcon}>Logout</Text>
+          </ListItem>
         </Content>
         <Footer>
           <FooterTab>

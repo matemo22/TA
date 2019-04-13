@@ -20,6 +20,22 @@ class FirebaseSvc {
     .then(success_callback, failed_callback);
   }
 
+  createUser = () => {
+    let user = this.auth.currentUser;
+    this.firestore.collection('user').add({
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL,
+      uid: user.uid,
+    })
+    .then(function(){
+      console.log("Create User DB Success");
+    })
+    .catch(function(error){
+      console.error("Failed to Create User DB", error);
+    });
+  }
+
   uploadAvatar = async (response) => {
     const metadata = {
       contentType: response.type,
@@ -27,10 +43,16 @@ class FirebaseSvc {
     var user = this.auth.currentUser;
     this.storage.ref().child('avatar/'+user.uid)
     .putFile(response.uri, metadata)
-    .then(uploadedFile => {
+    .then(async uploadedFile => {
       var user = this.auth.currentUser;
       user.updateProfile({
         photoURL: uploadedFile.downloadURL,
+      });
+      var ref = await this.firestore.collection('user').where('uid', '==', user.uid);
+      ref.get().then(async (querySnapshot) => {
+        querySnapshot.forEach(async (doc) => {
+          this.firestore.collection('user').doc(doc.id).update({photoURL: uploadedFile.downloadURL});
+        });
       });
       console.log("Success Upload File", uploadedFile);
     })
@@ -41,6 +63,12 @@ class FirebaseSvc {
 
   createProfile = async (user, success_callback) => {
     var currUser = this.auth.currentUser;
+    var ref = await this.firestore.collection('user').where('uid', '==', currUser.uid);
+    ref.get().then(async(querySnapshot) => {
+      querySnapshot.forEach(async(doc) => {
+        this.firestore.collection('user').doc(doc.id).update({displayName: user.name});
+      });
+    });
     currUser.updateProfile({
       displayName: user.name,
     })
@@ -105,6 +133,35 @@ class FirebaseSvc {
     });
   }
 
+  deleteCategory = (item) => {
+    this.firestore.collection("category").doc(item.id)
+    .delete()
+    .then(function() {
+      console.log("Category successfully deleted!");
+    })
+    .catch(function(error){
+      console.error("Error remove category", error);
+    });
+
+    let query = this.firestore.collection("chatrooms").where('cid', '==', item.id)
+    query.get().then(function(querySnapshot){
+      querySnapshot.forEach(function(doc) {
+        doc.ref.delete();
+      });
+    });
+  }
+
+  deleteChatroom = (id) => {
+    this.firestore.collection("chatrooms").doc(id)
+    .delete()
+    .then(function(){
+      console.log("Chatroom successfully deleted!");
+    })
+    .catch(function(error){
+      console.error("Error remove chatroom", error);
+    });
+  }
+
   getCurrentUser = () => {
     var user = this.auth.currentUser;
     return user;
@@ -129,6 +186,11 @@ class FirebaseSvc {
   getChatroomRef = (gid) => {
     var chatroomRef = this.firestore.collection("chatrooms").where('gid', '==', gid);
     return chatroomRef;
+  }
+
+  getRoleRef = (gid) => {
+    var roleRef = this.firestore.collection("roles").where('gid', '==', gid);
+    return roleRef;
   }
 
   logout = (success_callback, failed_callback) => {

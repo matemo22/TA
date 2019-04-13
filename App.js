@@ -62,6 +62,8 @@ import Profile from './src/pages/drawer/Profile';
 import Setting from './src/pages/drawer/settings/Setting';
 import EditGroup from './src/pages/drawer/settings/EditGroup';
 import Category from './src/pages/drawer/settings/Category';
+import EditCategory from './src/pages/drawer/settings/EditCategory';
+import EditChatroom from './src/pages/drawer/settings/EditChatroom';
 //->Statistic
 import Statistic from './src/pages/drawer/Statistic';
 //->Achievement
@@ -292,6 +294,12 @@ const SettingStackNavigator = createStackNavigator({
   },
   Category: {
     screen: Category,
+  },
+  EditCategory: {
+    screen: EditCategory,
+  },
+  EditChatroom: {
+    screen: EditChatroom,
   }
 }, {
   defaultNavigationOptions: ({navigation}) => {
