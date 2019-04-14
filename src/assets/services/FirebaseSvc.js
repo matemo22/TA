@@ -162,6 +162,12 @@ class FirebaseSvc {
     });
   }
 
+	deleteMember = (id, group) => {
+		this.firestore.collection("groups").doc(group.id).update({
+			members: group.data.members.arrayRemove(id),
+		})
+	}
+
   getCurrentUser = () => {
     var user = this.auth.currentUser;
     return user;
@@ -191,6 +197,11 @@ class FirebaseSvc {
   getRoleRef = (gid) => {
     var roleRef = this.firestore.collection("roles").where('gid', '==', gid);
     return roleRef;
+  }
+
+	getUserRef = () => {
+    var userRef = this.firestore.collection("user");
+    return userRef;
   }
 
   logout = (success_callback, failed_callback) => {

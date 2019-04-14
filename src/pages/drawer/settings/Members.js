@@ -39,210 +39,55 @@ export default class Members extends Component {
   }
 
   fetchUser = (querySnapshot) => {
-    let category = [];
+    let members = [];
     querySnapshot.forEach( (doc) => {
-      category.push({
-        doc: doc,
-        data: doc.data(),
-        id: doc.id,
-        title: doc.data().name,
-      });
+			if(this.group.data.members.includes(doc.id) && doc.id != FirebaseSvc.getCurrentUser().uid) {
+				members.push({
+	        doc: doc,
+	        data: doc.data(),
+	        id: doc.id,
+	      });
+			}
     });
 
     // this._storeCategoryData(category);
 
     this.setState({
-      category: category,
-      refresh: !this.state.refresh,
-    });
-  }
-
-  fetchChatroom = (querySnapshot) => {
-    let chatroom = [];
-    querySnapshot.forEach( (doc) => {
-      chatroom.push({
-        doc: doc,
-        data: doc.data(),
-        id: doc.id,
-      });
-    });
-
-    // this._storeChatroomsData(chatroom);
-
-    this.setState({
-      chatroom: chatroom,
-      refresh: !this.state.refresh,
-    });
-  }
-
-  fetchRole = (querySnapshot) => {
-    let role = [];
-    querySnapshot.forEach( (doc) => {
-      if(doc.data().members && doc.data().members.includes(FirebaseSvc.getCurrentUser().uid)){
-        role.push({
-          doc: doc,
-          data: doc.data(),
-          id: doc.id,
-        });
-      }
-    });
-
-    // this._storeChatroomsData(chatroom);
-
-    this.setState({
-      role: role,
+      members: members,
       refresh: !this.state.refresh,
     });
   }
 
   componentDidMount = async () => {
     // await this.retrieveDataGroup();
-    this.unsubscribeCategory = await FirebaseSvc
-      .getCategoryRef(this.group.id)
-      .onSnapshot(this.fetchCategory);
-    this.unsubscribeChatroom = await FirebaseSvc
-      .getChatroomRef(this.group.id)
-      .onSnapshot(this.fetchChatroom);
-    this.unsubscribeRole = await FirebaseSvc
-      .getRoleRef(this.group.id)
-      .onSnapshot(this.fetchRole);
-  }
+    this.unsubscribe = await FirebaseSvc
+      .getUserRef()
+      .onSnapshot(this.fetchUser);
 
   componentWillUnmount = () => {
-    this.unsubscribeCategory();
-    this.unsubscribeChatroom();
-    this.unsubscribeRole();
+    this.unsubscribe();
   }
 
-  _renderItem2 = ({item}) => {
+  _renderItem = ({item}) => {
     let temp = [];
-    if(!item.data.cid) {
-      temp.push(
-        <ListItem icon key={item.id}>
-          <Left>
-            <Icon name="book"/>
-          </Left>
-          <Body>
-            <Text>{item.data.name}</Text>
-          </Body>
-          <Right>
-            <Icon name="delete"/>
-          </Right>
-        </ListItem>
-      )
-    }
+    temp.push(
+      <ListItem icon key={item.id}>
+        <Left></Left>
+        <Body>
+          <Text>{item.data.displayName}</Text>
+        </Body>
+        <Right>
+          <Icon name="delete" onPress={()=>{this.deleteMember(item.id)}}/>
+        </Right>
+      </ListItem>
+    )
     return (
       temp
     )
   }
 
-  deleteCategory = (item) => {
-    FirebaseSvc.deleteCategory(item);
-  }
-
-  deleteChatroom = (id) => {
-    FirebaseSvc.deleteChatroom(id);
-  }
-
-  _renderItem = ({item, index}) => {
-    let temp = [];
-    let chatroom = this.state.chatroom;
-    let role = this.state.role;
-    if(item.data.private) {
-      if(role.some(r=>item.data.roles.includes(r.id))) {
-        temp.push(
-          <ListItem icon
-            key={item.id}
-            onPress={()=>{this.props.navigation.navigate('EditCategory', {item: item})}}
-            style={{backgroundColor: '#F8F8F8', marginLeft: 0, marginTop: 10}}>
-            <Left></Left>
-            <Body>
-              <View style={{flexDirection: 'row'}}>
-                <Text>{item.title}</Text>
-                <Icon name="edit"/>
-              </View>
-            </Body>
-            <Right>
-              <View style={{flexDirection: 'row'}}>
-                <Icon name="lock" style={{marginRight: 15}}/>
-                <Icon name="delete" onPress={()=>{this.deleteCategory(item)}}/>
-              </View>
-            </Right>
-          </ListItem>
-        );
-        if(chatroom.some(a=>a.data.cid === item.id)) {
-          for (var i = 0; i < chatroom.length; i++) {
-            if(chatroom[i].data.cid==item.id){
-              let chatroomData = chatroom[i];
-              temp.push(
-                <ListItem icon
-                  key={chatroom[i].id}
-                  onPress={()=>{this.props.navigation.navigate("EditChatroom", { item: chatroomData, parent: item})}}>
-                  <Left><Icon name="edit"/></Left>
-                  <Body><Text>{chatroom[i].data.name}</Text></Body>
-                  <Right><Icon name="delete" onPress={()=>{this.deleteChatroom(id)}}/></Right>
-                </ListItem>
-              );
-            }
-          }
-        }
-      }
-    }
-    else {
-      temp.push(
-        <ListItem icon
-          key={item.id}
-          onPress={()=>{this.props.navigation.navigate('EditCategory', {item: item})}}
-          style={{backgroundColor: '#F8F8F8', marginLeft: 0, marginTop: 10}}>
-          <Left></Left>
-          <Body>
-            <View style={{flexDirection: 'row'}}>
-              <Text>{item.title}</Text>
-              <Icon name="edit"/>
-            </View>
-          </Body>
-          <Right><Icon name="delete" onPress={()=>{this.deleteCategory(item)}}/></Right>
-        </ListItem>
-      );
-      if(chatroom.some(a=>a.data.cid === item.id)) {
-        for (var i = 0; i < chatroom.length; i++) {
-          if(chatroom[i].data.cid==item.id){
-            let chatroomData = chatroom[i];
-            if(chatroom[i].data.private) {
-              if(role.some(r=>chatroom[i].data.roles.includes(r.id))) {
-                temp.push(
-                  <ListItem icon
-                    key={chatroom[i].id}
-                    onPress={()=>{this.props.navigation.navigate("EditChatroom", {item: chatroomData, parent: item})}}>
-                    <Left><Icon name="edit"/></Left>
-                    <Body><Text>{chatroom[i].data.name}</Text></Body>
-                    <Right>
-                      <Icon name="lock"/>
-                      <Icon name="delete" style={{marginLeft: 15}} onPress={()=>{this.deleteChatroom(id)}}/>
-                    </Right>
-                  </ListItem>
-                );
-              }
-            }
-            else {
-              temp.push(
-                <ListItem icon
-                  key={chatroom[i].id}
-                  onPress={()=>{this.props.navigation.navigate("EditChatroom", {item: chatroomData, parent:item})}}>
-                  <Left><Icon name="edit"/></Left>
-                  <Body><Text>{chatroom[i].data.name}</Text></Body>
-                  <Right><Icon name="delete" onPress={()=>{this.deleteChatroom(id)}}/></Right>
-                </ListItem>
-              );
-            }
-          }
-        }
-      }
-    }
-
-    return(
-      temp
-    )
+  deleteMember = (id) => {
+    FirebaseSvc.deleteMember(id, this.group);
   }
 
   render() {
@@ -268,27 +113,13 @@ export default class Members extends Component {
         <Content bounces={false}>
           <List>
             <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
-              <Text>Category</Text>
-            </ListItem>
-            <ListItem icon
-              style={{marginLeft: 0, backgroundColor: "#F8F8F8"}}>
-              <Left></Left>
-              <Body>
-                <Text>Uncategorized</Text>
-              </Body>
-              <Right></Right>
+              <Text>Members</Text>
             </ListItem>
             <FlatList
-              data={this.state.chatroom}
-              renderItem={this._renderItem2}
-              extraData={this.state.refresh}
-              keyExtractor={item=>item.id}
-            />
-            <FlatList
-              data={this.state.category}
+              data={this.state.members}
               renderItem={this._renderItem}
               extraData={this.state.refresh}
-              keyExtractor={item => item.id}
+              keyExtractor={item=>item.id}
             />
           </List>
         </Content>
