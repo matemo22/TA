@@ -64,6 +64,12 @@ import EditGroup from './src/pages/drawer/settings/EditGroup';
 import Category from './src/pages/drawer/settings/Category';
 import EditCategory from './src/pages/drawer/settings/EditCategory';
 import EditChatroom from './src/pages/drawer/settings/EditChatroom';
+import EditChatroomUn from './src/pages/drawer/settings/EditChatroomUn';
+import Members from './src/pages/drawer/settings/Members';
+import EditMember from './src/pages/drawer/settings/EditMember';
+import Role from './src/pages/drawer/settings/Role';
+import CreateRole from './src/pages/drawer/settings/CreateRole';
+import EditRole from './src/pages/drawer/settings/EditRole';
 //->Statistic
 import Statistic from './src/pages/drawer/Statistic';
 //->Achievement
@@ -300,6 +306,24 @@ const SettingStackNavigator = createStackNavigator({
   },
   EditChatroom: {
     screen: EditChatroom,
+  },
+  EditChatroomUn: {
+    screen: EditChatroomUn,
+  },
+  Members: {
+    screen: Members,
+  },
+  EditMember: {
+    screen: EditMember,
+  },
+  Role: {
+    screen: Role,
+  },
+  CreateRole: {
+    screen: CreateRole,
+  },
+  EditRole: {
+    screen: EditRole,
   }
 }, {
   defaultNavigationOptions: ({navigation}) => {

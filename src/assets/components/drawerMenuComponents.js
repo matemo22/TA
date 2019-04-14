@@ -38,6 +38,7 @@ export default class drawerMenuComponents extends Component {
     this.unsubscribeCategory=null;
     this.unsubscribeChatroom=null;
     this.unsubscribeRole=null;
+    this.unsubscribeUser=null;
 
     this.state = {
       groups: [],
@@ -46,7 +47,7 @@ export default class drawerMenuComponents extends Component {
       role: [],
       selectedList: '',
       selectedGroup: '',
-      user: null,
+      user: {},
       photoURL: '',
       refresh: false,
       mainDrawer: false,
@@ -54,8 +55,12 @@ export default class drawerMenuComponents extends Component {
   }
 
   async componentDidMount() {
+    // FirebaseSvc.initData();
     let group = await this.retrieveDataGroup();
     this.retrieveDataMainDrawer();
+    this.unsubscribeUser = await FirebaseSvc
+      .getUserRef(FirebaseSvc.getCurrentUser().uid)
+      .onSnapshot(this.fetchUser);
     this.unsubscribeGroup = await FirebaseSvc
       .getGroupRef()
       .onSnapshot(this.fetchGroup);
@@ -68,12 +73,6 @@ export default class drawerMenuComponents extends Component {
     this.unsubscribeRole = await FirebaseSvc
       .getRoleRef(this.state.selectedGroup.id)
       .onSnapshot(this.fetchRole);
-    var user = FirebaseSvc.getCurrentUser();
-    console.log("User", user);
-    this.setState({
-      user,
-      photoURL: user.photoURL,
-    });
   }
 
   componentWillUnmount() {
@@ -81,6 +80,7 @@ export default class drawerMenuComponents extends Component {
     this.unsubscribeCategory();
     this.unsubscribeChatroom();
     this.unsubscribeRole();
+    this.unsubscribeUser();
 	}
 
   retrieveDataGroup = async () => {
@@ -116,26 +116,11 @@ export default class drawerMenuComponents extends Component {
         id: doc.id,
       });
     });
-
-    // this._storeGroupData(groups);
-
     this.setState({
       groups: groups,
       selectedGroup: selectedGroup,
       refresh: !this.state.refresh,
     });
-  }
-
-  _storeGroupData = async (item) => {
-    try {
-      console.log("Data", item);
-      console.log("stringify", JSON.stringify(item));
-      var data = await AsyncStorage.setItem('groups', JSON.stringify(item));
-      return data;
-    }
-    catch(error) {
-      console.log("Error Store Data Groups",error);
-    }
   }
 
   fetchCategory = (querySnapshot) => {
@@ -148,23 +133,10 @@ export default class drawerMenuComponents extends Component {
         title: doc.data().name,
       });
     });
-
-    // this._storeCategoryData(category);
-
     this.setState({
       category: category,
       refresh: !this.state.refresh,
     });
-  }
-
-  _storeCategoryData = async (item) => {
-    try {
-      var data = await AsyncStorage.setItem('categories', JSON.stringify(item));
-      return data;
-    }
-    catch(error) {
-      console.log("Error Store Data Categories",error);
-    }
   }
 
   fetchChatroom = (querySnapshot) => {
@@ -176,29 +148,29 @@ export default class drawerMenuComponents extends Component {
         id: doc.id,
       });
     });
-
-    // this._storeChatroomsData(chatroom);
-
     this.setState({
       chatroom: chatroom,
       refresh: !this.state.refresh,
     });
   }
 
-  _storeChatroomsData = async (item) => {
-    try {
-      var data = await AsyncStorage.setItem('chatrooms', JSON.stringify(item));
-      return data;
-    }
-    catch(error) {
-      console.log("Error Store Data Chatrooms",error);
-    }
+  fetchUser = (doc) => {
+    let data = doc.data();
+    let user = {
+      doc: doc,
+      data: data,
+      id: doc.id,
+    };
+    this.setState({
+      user: user,
+    });
   }
 
   fetchRole = (querySnapshot) => {
     let role = [];
     querySnapshot.forEach( (doc) => {
-      if(doc.data().members && doc.data().members.includes(FirebaseSvc.getCurrentUser().uid)){
+      let user = this.state.user;
+      if(user.data.roles && user.data.roles.includes(doc.id)) {
         role.push({
           doc: doc,
           data: doc.data(),
@@ -206,9 +178,6 @@ export default class drawerMenuComponents extends Component {
         });
       }
     });
-
-    // this._storeChatroomsData(chatroom);
-
     this.setState({
       role: role,
       refresh: !this.state.refresh,
@@ -245,16 +214,6 @@ export default class drawerMenuComponents extends Component {
       this.props.navigation.dispatch(navigateAction);
     }
   );
-
-  // navigateToChatroom = (route) => (
-  //   () => {
-  //     const resetAction = StackActions.reset({
-  //       index: 0,
-  //       actions: [NavigationActions.navigate({ routeName: 'Chatroom' })],
-  //     });
-  //     this.props.navigation.dispatch(resetAction);
-  //   }
-  // )
 
   logout = async () => {
     await FirebaseSvc.logout(this.logoutSuccess, this.logoutFailed);
@@ -293,6 +252,7 @@ export default class drawerMenuComponents extends Component {
     let temp = [];
     let chatroom = this.state.chatroom;
     let role = this.state.role;
+    let user = this.state.user;
     if(item.data.private) {
       if(role.some(r=>item.data.roles.includes(r.id))) {
         temp.push(

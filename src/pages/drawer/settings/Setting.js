@@ -123,7 +123,7 @@ export default class Setting extends Component {
 
               </Right>
             </ListItem>
-            <ListItem icon onPress={()=>{console.log("Members");}}>
+            <ListItem icon onPress={()=>{this.props.navigation.navigate("Members", {group: this.state.group})}}>
               <Left>
                 <Icon name="user"/>
               </Left>
@@ -134,7 +134,7 @@ export default class Setting extends Component {
 
               </Right>
             </ListItem>
-            <ListItem icon onPress={()=>{console.log("Roles");}}>
+            <ListItem icon onPress={()=>{this.props.navigation.navigate("Role", {group: this.state.group})}}>
               <Left>
                 <Icon name="solution1"/>
               </Left>

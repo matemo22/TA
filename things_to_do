@@ -1,6 +1,9 @@
 ~/Library/Android/sdk/tools/emulator -list-avds
 ~/Library/Android/sdk/tools/emulator -avd Nexus_5X_API_27
 
+
+watchman watch-del-all && rm -rf $TMPDIR/react-* && rm -rf node_modules/ && npm cache verify && npm install && npm start -- --reset-cache
+
 onPress={()=>{navigation.push('Chatroom', {
   title: name,
  data: data,

@@ -26,14 +26,12 @@ import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
-export default class EditChatroom extends Component {
+export default class EditChatroomUn extends Component {
   constructor(props){
     super(props);
     this.unsubscribeRole = null;
     this.item = this.props.navigation.getParam('item', []);
-    this.parent = this.props.navigation.getParam('parent', []);
-    // console.log("Item", this.item);
-    // console.log("parent", this.parent);
+
     this.state = {
       name:this.item.data.name,
       status: this.item.data.private ? true : false,

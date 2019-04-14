@@ -1,7 +1,7 @@
 /* @flow */
 
 import React, { Component } from 'react';
-import { View, AsyncStorage, FlatList } from 'react-native';
+import { View, FlatList } from 'react-native';
 import {
   Container,
 	Header,
@@ -20,72 +20,64 @@ import {
   ListItem,
   Thumbnail,
   Drawer,
+  Toast,
 } from 'native-base';
 import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-export default class Members extends Component {
-  constructor(props){
+export default class Role extends Component {
+  constructor(props) {
     super(props);
-    this.unsubscribeUser = null;
+    this.unsubscribe = null;
     this.group = this.props.navigation.getParam('group', []);
     this.state = {
-      group: this.group,
       refresh: false,
-      members: [],
-    };
+      role: [],
+      showToast: false,
+    }
   }
 
   componentDidMount = async () => {
-    this.unsubscribeUser = await FirebaseSvc
-    .getAllUserRefByGId(this.group.id)
-    .onSnapshot(this.fetchUser);
+    this.unsubscribe = await FirebaseSvc
+      .getRoleRef(this.group.id)
+      .onSnapshot(this.fetchRole);
   }
 
   componentWillUnmount = () => {
-    this.unsubscribeUser();
+    this.unsubscribe();
   }
 
-  fetchUser = (querySnapshot) => {
-    let members = [];
+  fetchRole = (querySnapshot) => {
+    let role = [];
     querySnapshot.forEach( (doc) => {
-      members.push({
+			role.push({
         doc: doc,
         data: doc.data(),
         id: doc.id,
       });
     });
+
     this.setState({
-      members: members,
+      role: role,
       refresh: !this.state.refresh,
     });
   }
 
-  // fetchUser = (doc) => {
-  //   let data = doc.data();
-  //   let user = {
-  //     doc: doc,
-  //     data: data,
-  //     id: doc.id,
-  //   };
-  //   this.setState({
-  //     user: user,
-  //     refresh: !this.state.refresh,
-  //   });
-  // }
-
   _renderItem = ({item}) => {
     let temp = [];
     temp.push(
-      <ListItem
-      icon key={item.id}
-      onPress={()=>{this.props.navigation.navigate("EditMember", {group: this.group, member: item})}}>
+      <ListItem icon
+        key={item.id}
+        onPress={()=>{this.props.navigation.navigate("EditRole", {item: item})}}>
         <Left></Left>
         <Body>
-          <Text>{item.data.displayName}{item.data.uid == FirebaseSvc.getCurrentUser().uid ? " (You)" : ""}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <Text>{item.data.name}</Text>
+            <Icon name="edit"/>
+          </View>
         </Body>
         <Right>
-          <Icon name="delete" onPress={()=>{this.deleteMember(item.data.uid)}}/>
+          <Icon name="delete" onPress={()=>{this.deleteRole(item)}}/>
         </Right>
       </ListItem>
     )
@@ -94,13 +86,14 @@ export default class Members extends Component {
     )
   }
 
-  deleteMember = async (id) => {
-    FirebaseSvc.deleteMember(id, this.state.group, this.deleteSuccess());
+  deleteRole = (item) => {
+    //Do Delete FirebaseSvc
+    FirebaseSvc.deleteRole(item.id, this.deleteSuccess(item));
   }
 
-  deleteSuccess = () => {
+  deleteSuccess = (item) => {
     Toast.show({
-      text: "Member deleted Successfully",
+      text: "Role "+item.data.name+" deleted Successfully",
       buttonText: "Okay!",
       duration: 2000,
     });
@@ -129,10 +122,18 @@ export default class Members extends Component {
         <Content bounces={false}>
           <List>
             <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
-              <Text>Members</Text>
+              <Left><Text>Roles</Text></Left>
+              <Right>
+                <Text
+                  onPress={()=>{this.props.navigation.navigate("CreateRole", {group: this.group})}}
+                  style={{marginRight: 5}}
+                >
+                  Add
+                </Text>
+              </Right>
             </ListItem>
             <FlatList
-              data={this.state.members}
+              data={this.state.role}
               renderItem={this._renderItem}
               extraData={this.state.refresh}
               keyExtractor={item=>item.id}

@@ -30,6 +30,7 @@ export default class Category extends Component {
     this.unsubscribeCategory = null;
     this.unsubscribeChatroom = null;
     this.unsubscribeRole = null;
+    this.unsubscribeUser = null;
     this.group = this.props.navigation.getParam('group', []);
 
     this.state = {
@@ -39,6 +40,7 @@ export default class Category extends Component {
       chatroom: [],
       category: [],
       role: [],
+      user: {},
     };
   }
 
@@ -56,65 +58,11 @@ export default class Category extends Component {
     }
   }
 
-  fetchCategory = (querySnapshot) => {
-    let category = [];
-    querySnapshot.forEach( (doc) => {
-      category.push({
-        doc: doc,
-        data: doc.data(),
-        id: doc.id,
-        title: doc.data().name,
-      });
-    });
-
-    // this._storeCategoryData(category);
-
-    this.setState({
-      category: category,
-      refresh: !this.state.refresh,
-    });
-  }
-
-  fetchChatroom = (querySnapshot) => {
-    let chatroom = [];
-    querySnapshot.forEach( (doc) => {
-      chatroom.push({
-        doc: doc,
-        data: doc.data(),
-        id: doc.id,
-      });
-    });
-
-    // this._storeChatroomsData(chatroom);
-
-    this.setState({
-      chatroom: chatroom,
-      refresh: !this.state.refresh,
-    });
-  }
-
-  fetchRole = (querySnapshot) => {
-    let role = [];
-    querySnapshot.forEach( (doc) => {
-      if(doc.data().members && doc.data().members.includes(FirebaseSvc.getCurrentUser().uid)){
-        role.push({
-          doc: doc,
-          data: doc.data(),
-          id: doc.id,
-        });
-      }
-    });
-
-    // this._storeChatroomsData(chatroom);
-
-    this.setState({
-      role: role,
-      refresh: !this.state.refresh,
-    });
-  }
-
   componentDidMount = async () => {
     // await this.retrieveDataGroup();
+    this.unsubscribeUser = await FirebaseSvc
+      .getUserRef(FirebaseSvc.getCurrentUser().uid)
+      .onSnapshot(this.fetchUser);
     this.unsubscribeCategory = await FirebaseSvc
       .getCategoryRef(this.group.id)
       .onSnapshot(this.fetchCategory);
@@ -130,13 +78,77 @@ export default class Category extends Component {
     this.unsubscribeCategory();
     this.unsubscribeChatroom();
     this.unsubscribeRole();
+    this.unsubscribeUser();
+  }
+
+  fetchCategory = (querySnapshot) => {
+    let category = [];
+    querySnapshot.forEach( (doc) => {
+      category.push({
+        doc: doc,
+        data: doc.data(),
+        id: doc.id,
+        title: doc.data().name,
+      });
+    });
+    this.setState({
+      category: category,
+      refresh: !this.state.refresh,
+    });
+  }
+
+  fetchChatroom = (querySnapshot) => {
+    let chatroom = [];
+    querySnapshot.forEach( (doc) => {
+      chatroom.push({
+        doc: doc,
+        data: doc.data(),
+        id: doc.id,
+      });
+    });
+    this.setState({
+      chatroom: chatroom,
+      refresh: !this.state.refresh,
+    });
+  }
+
+  fetchUser = (doc) => {
+    let data = doc.data();
+    let user = {
+      doc: doc,
+      data: data,
+      id: doc.id,
+    };
+    this.setState({
+      user: user,
+    });
+  }
+
+  fetchRole = (querySnapshot) => {
+    let role = [];
+    querySnapshot.forEach( (doc) => {
+      let user = this.state.user;
+      if(user.data.roles && user.data.roles.includes(doc.id)) {
+        role.push({
+          doc: doc,
+          data: doc.data(),
+          id: doc.id,
+        });
+      }
+    });
+    this.setState({
+      role: role,
+      refresh: !this.state.refresh,
+    });
   }
 
   _renderItem2 = ({item}) => {
     let temp = [];
     if(!item.data.cid) {
       temp.push(
-        <ListItem icon key={item.id}>
+        <ListItem icon
+          key={item.id}
+          onPress={()=>{this.props.navigation.navigate("EditChatroomUn", {item: item})}}>
           <Left>
             <Icon name="book"/>
           </Left>
