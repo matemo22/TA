@@ -32,9 +32,6 @@ export default class CreateChatroomUn extends Component {
     super(props);
     this.unsubscribeRole = null;
     this.group = this.props.navigation.getParam('group', []);
-		this.item = this.props.navigation.getParam('item', []);
-    console.log("Item", this.item);
-
     this.state = {
       name:'',
       status: false,
@@ -110,15 +107,14 @@ export default class CreateChatroomUn extends Component {
       gid: this.group.id,
       private: this.state.status,
       roles: this.state.selectedRoles,
-      cid: this.item.id,
     };
 
-    FirebaseSvc.createChatroom(chatroom, this.createSuccess());
+    FirebaseSvc.createChatroomUn(chatroom, this.createSuccess());
   }
 
   createSuccess = () => {
     Toast.show({
-      text: "Create "+this.item.title+"'s Chatroom Success!",
+      text: "Create Uncategorized Chatroom Success!",
       buttonText: "Okay!",
       duration: 2000,
     });
@@ -152,7 +148,7 @@ export default class CreateChatroomUn extends Component {
         </Header>
         <Content>
           <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
-            <Text>{this.item.title}'s Chatroom</Text>
+            <Text>Uncategorized Chatroom</Text>
           </ListItem>
           <Form>
             <Item floatingLabel>

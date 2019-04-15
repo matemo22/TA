@@ -33,6 +33,7 @@ export default class Setting extends Component {
     this.state = {
       group: '',
       doc: '',
+      uri: '',
       refresh: false,
     };
   }
@@ -67,6 +68,7 @@ export default class Setting extends Component {
     this.setState({
       group: group,
       doc: doc,
+      uri: doc._data.photoURL,
       refresh: !this.state.refresh,
     });
   }
@@ -93,7 +95,7 @@ export default class Setting extends Component {
         </Header>
         <Content bounces={false}>
           <View style={{backgroundColor: "#F8F8F8", justifyContent: 'center', alignItems: 'center'}}>
-            <Thumbnail large source={this.state.doc ? {uri: this.state.doc._data.photoURL} : require('../../../assets/images/icon.png')} />
+            <Thumbnail large source={this.state.uri!='' ? {uri: this.state.uri} : require('../../../assets/images/icon.png')} />
             <Text style={{marginTop: 20, fontSize: 20}}>{this.state.doc ? this.state.doc._data.name : "Group Name"}</Text>
           </View>
 
@@ -108,9 +110,7 @@ export default class Setting extends Component {
               <Body>
                 <Text>Edit Group</Text>
               </Body>
-              <Right>
-
-              </Right>
+              <Right></Right>
             </ListItem>
             <ListItem icon onPress={()=>{this.props.navigation.navigate("Category", {group: this.state.group})}}>
               <Left>
@@ -119,9 +119,7 @@ export default class Setting extends Component {
               <Body>
                 <Text>Category</Text>
               </Body>
-              <Right>
-
-              </Right>
+              <Right></Right>
             </ListItem>
             <ListItem icon onPress={()=>{this.props.navigation.navigate("Members", {group: this.state.group})}}>
               <Left>
@@ -130,9 +128,7 @@ export default class Setting extends Component {
               <Body>
                 <Text>Members</Text>
               </Body>
-              <Right>
-
-              </Right>
+              <Right></Right>
             </ListItem>
             <ListItem icon onPress={()=>{this.props.navigation.navigate("Role", {group: this.state.group})}}>
               <Left>
@@ -141,20 +137,16 @@ export default class Setting extends Component {
               <Body>
                 <Text>Roles</Text>
               </Body>
-              <Right>
-
-              </Right>
+              <Right></Right>
             </ListItem>
-            <ListItem icon onPress={()=>{console.log("Invitation Code");}}>
+            <ListItem icon onPress={()=>{this.props.navigation.navigate("InvitationCode", {group: this.state.group})}}>
               <Left>
                 <Icon name="link"/>
               </Left>
               <Body>
-                <Text>Invitation Code</Text>
+                <Text>Group Code</Text>
               </Body>
-              <Right>
-
-              </Right>
+              <Right></Right>
             </ListItem>
           </List>
         </Content>

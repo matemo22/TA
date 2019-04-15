@@ -33,7 +33,7 @@ export default class EditMember extends Component {
     this.unsubscribeRole = null;
     this.member = this.props.navigation.getParam('member', []);
     this.group = this.props.navigation.getParam('group', []);
-    console.log("Member", this.member);
+    // console.log("Member", this.member);
 
     this.state = {
       user: this.member,
@@ -63,7 +63,7 @@ export default class EditMember extends Component {
       data: doc.data(),
       id: doc.id,
     };
-    console.log("User",user);
+    // console.log("User",user);
     this.setState({
       user: user,
     });

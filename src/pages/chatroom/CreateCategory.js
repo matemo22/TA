@@ -27,14 +27,11 @@ import FirebaseSvc from '../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
-export default class CreateChatroomUn extends Component {
+export default class CreateCategory extends Component {
   constructor(props){
     super(props);
     this.unsubscribeRole = null;
     this.group = this.props.navigation.getParam('group', []);
-		this.item = this.props.navigation.getParam('item', []);
-    console.log("Item", this.item);
-
     this.state = {
       name:'',
       status: false,
@@ -104,21 +101,20 @@ export default class CreateChatroomUn extends Component {
 
   onChangeTextName = (name) => {this.setState({name, nameEdited: true});}
 
-  createChatroom = () => {
-    var chatroom = {
+  createCategory = () => {
+    var category = {
       name: this.state.name,
       gid: this.group.id,
       private: this.state.status,
       roles: this.state.selectedRoles,
-      cid: this.item.id,
     };
 
-    FirebaseSvc.createChatroom(chatroom, this.createSuccess());
+    FirebaseSvc.createCategory(category, this.createSuccess());
   }
 
   createSuccess = () => {
     Toast.show({
-      text: "Create "+this.item.title+"'s Chatroom Success!",
+      text: "Create Category Success!",
       buttonText: "Okay!",
       duration: 2000,
     });
@@ -140,28 +136,26 @@ export default class CreateChatroomUn extends Component {
               />
             </Button>
           </Left>
-          <Body stle={{flex: 3}}></Body>
+          <Body stle={{flex: 3}}>
+          </Body>
           <Right>
             <Button
               disabled={!this.state.nameEdited && !this.state.roleEdited && !this.state.statusEdited}
               transparent
-              onPress={()=>{this.createChatroom()}}>
+              onPress={()=>{this.createCategory()}}>
               <Text>Save</Text>
             </Button>
           </Right>
         </Header>
         <Content>
-          <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
-            <Text>{this.item.title}'s Chatroom</Text>
-          </ListItem>
           <Form>
             <Item floatingLabel>
-              <Label>Chatroom Name</Label>
+              <Label>Category Name</Label>
               <Input onChangeText={(name) => {this.onChangeTextName(name)}} />
             </Item>
 						<View style={{borderBottomColor: '#F2F0F3', borderBottomWidth: 1}}>
 							<View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 16}}>
-								<Text style={{color: '#757575'}}>Private Chatroom</Text>
+								<Text style={{color: '#757575'}}>Private Category</Text>
 								<Switch
 									value={this.state.status}
 									onValueChange={this.valueChange}
@@ -169,12 +163,12 @@ export default class CreateChatroomUn extends Component {
 								/>
 							</View>
 							<View style={{marginLeft: 16, marginTop: -6, marginBottom: 16}}>
-								<Text note>By making a Chatroom private, only selected roles will have access to this Chatroom.</Text>
+								<Text note>By making a Category private, only selected roles will have access to this Category.</Text>
 							</View>
 						</View>
 						{ this.state.status ?
 							<View style={{margin: 16}}>
-								<Text style={{textTransform: 'uppercase', fontSize: 12, color: '#757575'}}>Who can Access this Chatroom?</Text>
+								<Text style={{textTransform: 'uppercase', fontSize: 12, color: '#757575'}}>Who can Access this Category?</Text>
 								<View style={{marginTop: 10}}>
 									<FlatList
 										data={this.state.role}

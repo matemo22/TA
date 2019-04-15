@@ -1,4 +1,5 @@
 import firebase from 'react-native-firebase';
+import { AsyncStorage } from 'react-native';
 
 class FirebaseSvc {
   constructor() {
@@ -33,6 +34,16 @@ class FirebaseSvc {
   //     roles: ["aAsfDOywWWgEPbocj6yP"],
   //   });
   // }
+
+  generateCode = (length) => {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (var i = 0; i < length; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+  }
 
   login = async (user, success_callback, failed_callback) => {
     await this.auth
@@ -103,12 +114,14 @@ class FirebaseSvc {
   createGroup = async (group, response) => {
     let user = this.auth.currentUser;
     let members = [];
+    let code = this.generateCode(6);
     members.push(user.uid);
     this.firestore.collection("groups").add({
       name: group.name,
       photoURL: '',
       members: members,
       createdBy: user.uid,
+      code: code,
     })
     .then(async (docRef) => {
       if(response) {
@@ -162,6 +175,46 @@ class FirebaseSvc {
     });
   }
 
+  createCategory = (category, success_callback) => {
+    this.firestore.collection("category").add({
+      name: category.name,
+      gid: category.gid,
+      private: category.private,
+      roles: category.roles,
+    })
+    .then(success_callback, function(error) {
+      console.error("Failed to create Category", error);
+      alert("Failed to Create Category");
+    });
+  }
+
+  createChatroomUn = (chatroom, success_callback) => {
+    this.firestore.collection("chatrooms").add({
+      name: chatroom.name,
+      gid: chatroom.gid,
+      private: chatroom.private,
+      roles: chatroom.roles,
+    })
+    .then(success_callback, function(error) {
+      console.error("Failed to create Chatroom", error);
+      alert("Failed to Create Category");
+    });
+  }
+
+  createChatroom = (chatroom, success_callback) => {
+    this.firestore.collection("chatrooms").add({
+      name: chatroom.name,
+      gid: chatroom.gid,
+      private: chatroom.private,
+      roles: chatroom.roles,
+      cid: chatroom.cid,
+    })
+    .then(success_callback, function(error) {
+      console.error("Failed to create Chatroom", error);
+      alert("Failed to Create Category");
+    });
+  }
+
   editGroup = (group) => {
     let batch = this.firestore.batch();
     let ref = this.firestore.collection("groups").doc(group.id);
@@ -175,6 +228,43 @@ class FirebaseSvc {
     })
     .catch((error) => {
       console.log("Error Writing Data", error);
+    });
+  }
+
+  joinGroup = async (code) => {
+    let ref = await this.firestore.collection("groups").where('code', '==', code).limit(1);
+    ref.get()
+    .then((querySnapshot) => {
+      if(querySnapshot.size == 0) {
+        alert("Group Not Found!");
+        // AsyncStorage.setItem("message", "Group not Found");
+      }
+      else {
+        querySnapshot.forEach((doc) => {
+          let members = doc.data().members;
+          let user = this.auth.currentUser;
+          let found = members.includes(user.uid);
+          let id = doc.id;
+          let groupRef = doc.ref;
+          if(found) {
+            alert("You already in Group");
+            // AsyncStorage.setItem("message", "You already in Group");
+          }
+          else {
+            members.push(user.uid);
+            let userRef = this.firestore.collection("user").doc(user.uid);
+            return this.firestore.runTransaction((transaction) => {
+              return transaction.get(userRef).then((doc) => {
+                var groups = doc.data().groups;
+                groups.push(id);
+                transaction.update(userRef, { groups: groups });
+                transaction.update(groupRef, { members: members });
+              });
+            });
+            // AsyncStorage.setItem("message", "Success");
+          }
+        });
+      }
     });
   }
 
@@ -203,13 +293,23 @@ class FirebaseSvc {
     })
   }
 
-  deleteCategory = (item) => {
+  updateCode = (gid, success_callback) => {
+    let batch = this.firestore.batch();
+    let ref = this.firestore.collection("groups").doc(gid);
+    let code = this.generateCode(6);
+    batch.update(ref, {
+      code: code,
+    });
+    batch.commit()
+    .then(success_callback, function(error) {
+      console.error("Error Update Group Code", error);
+    })
+  }
+
+  deleteCategory = (item, success_callback) => {
     this.firestore.collection("category").doc(item.id)
     .delete()
-    .then(function() {
-      console.log("Category successfully deleted!");
-    })
-    .catch(function(error){
+    .then(success_callback, function(error){
       console.error("Error remove category", error);
     });
 

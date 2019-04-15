@@ -28,6 +28,7 @@ import NewUser from './src/pages/auth/NewUser';
 import Home from './src/pages/Home';
 import Dashboard from './src/pages/Dashboard';
 import CreateGroup from './src/pages/CreateGroup';
+import JoinGroup from './src/pages/JoinGroup';
 //##TabNavigator
 //->Planner
 import Planner from './src/pages/planner/Planner';
@@ -57,6 +58,8 @@ import drawerMenuComponents from './src/assets/components/drawerMenuComponents';
 import Chatroom from './src/pages/chatroom/Chatroom';
 import CreateChatroom from './src/pages/chatroom/CreateChatroom';
 import Profile from './src/pages/drawer/Profile';
+import CreateCategory from './src/pages/chatroom/CreateCategory';
+import CreateChatroomUn from './src/pages/chatroom/CreateChatroomUn';
 
 //##Settings
 import Setting from './src/pages/drawer/settings/Setting';
@@ -70,6 +73,7 @@ import EditMember from './src/pages/drawer/settings/EditMember';
 import Role from './src/pages/drawer/settings/Role';
 import CreateRole from './src/pages/drawer/settings/CreateRole';
 import EditRole from './src/pages/drawer/settings/EditRole';
+import InvitationCode from './src/pages/drawer/settings/InvitationCode';
 //->Statistic
 import Statistic from './src/pages/drawer/Statistic';
 //->Achievement
@@ -245,6 +249,14 @@ const HomeStackNavigator = createStackNavigator({
           }
         }
       },
+      JoinGroup: {
+        screen: JoinGroup,
+        navigationOptions: ({navigation}) => {
+          return {
+            header: null,
+          }
+        },
+      }
     }, {
       defaultNavigationOptions: ({navigation}) => {
         return {
@@ -324,6 +336,9 @@ const SettingStackNavigator = createStackNavigator({
   },
   EditRole: {
     screen: EditRole,
+  },
+  InvitationCode: {
+    screen: InvitationCode,
   }
 }, {
   defaultNavigationOptions: ({navigation}) => {
@@ -347,11 +362,17 @@ const AppDrawerNavigator = createDrawerNavigator({
   Setting: {
     screen: SettingStackNavigator,
   },
+  CreateCategory: {
+    screen: CreateCategory,
+  },
   Chatroom: {
     screen: ChatroomStackNavigator,
   },
   CreateChatroom: {
     screen: CreateChatroom,
+  },
+  CreateChatroomUn: {
+    screen: CreateChatroomUn,
   },
   Profile: {
     screen: ProfileStackNavigator,

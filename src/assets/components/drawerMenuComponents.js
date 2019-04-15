@@ -75,7 +75,7 @@ export default class drawerMenuComponents extends Component {
       .onSnapshot(this.fetchRole);
   }
 
-  componentWillUnmount() {
+  componentWillUnmount = () => {
 		this.unsubscribeGroup();
     this.unsubscribeCategory();
     this.unsubscribeChatroom();
@@ -271,7 +271,10 @@ export default class drawerMenuComponents extends Component {
               </View>
             </Left>
             <Right>
-              <MaterialIcon name="add" color="#777777" onPress={()=>{this.props.navigation.navigate("CreateChatroom", {id: item.id, doc: item.doc, })}}/>
+              <MaterialIcon
+                name="add"
+                color="#777777"
+                onPress={()=>{this.props.navigation.navigate("CreateChatroom", {group: this.state.selectedGroup, item: item })}}/>
             </Right>
           </ListItem>
         );
@@ -303,7 +306,10 @@ export default class drawerMenuComponents extends Component {
             <Text style={{color: '#777777', marginLeft: 16, fontSize: 10, fontFamily: 'System', textTransform: 'uppercase'}}>{item.title}</Text>
           </Left>
           <Right>
-            <MaterialIcon name="add" color="#777777" onPress={()=>{this.props.navigation.navigate("CreateChatroom", {id: item.id, doc: item.doc, })}}/>
+            <MaterialIcon
+              name="add"
+              color="#777777"
+              onPress={()=>{this.props.navigation.navigate("CreateChatroom", {group: this.state.selectedGroup, item: item })}}/>
           </Right>
         </ListItem>
       );
@@ -413,10 +419,14 @@ export default class drawerMenuComponents extends Component {
       });
     }
     else if(buttonIndex==1) {
-      console.log("Create Category");
+      this.props.navigation.navigate("CreateCategory", {
+        group: this.state.selectedGroup
+      });
     }
     else if(buttonIndex==2) {
-      console.log("Create Chatroom");
+      this.props.navigation.navigate("CreateChatroomUn", {
+        group: this.state.selectedGroup
+      });
     }
   }
 
@@ -508,15 +518,11 @@ export default class drawerMenuComponents extends Component {
     return (
       <Container>
         <Header>
-          <Left>
-
-          </Left>
+          <Left></Left>
           <Body>
             <Title style={{marginLeft: 5, textAlign: 'left', alignSelf: 'flex-start'}}>Group</Title>
           </Body>
-          <Right>
-
-          </Right>
+          <Right></Right>
         </Header>
         <Content>
           <FlatList
@@ -537,7 +543,7 @@ export default class drawerMenuComponents extends Component {
             })}}>
               <Text>Create Group</Text>
             </Button>
-            <Button>
+            <Button onPress={()=>{this.props.navigation.navigate("JoinGroup")}}>
               <Text>Join Group</Text>
             </Button>
           </FooterTab>
