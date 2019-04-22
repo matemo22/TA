@@ -26,12 +26,14 @@ import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
-export default class EditChatroomUn extends Component {
+export default class EditChatroom extends Component {
   constructor(props){
     super(props);
     this.unsubscribeRole = null;
     this.item = this.props.navigation.getParam('item', []);
-
+    this.parent = this.props.navigation.getParam('parent', []);
+    // console.log("Item", this.item);
+    // console.log("parent", this.parent);
     this.state = {
       name:this.item.data.name,
       status: this.item.data.private ? true : false,
@@ -98,6 +100,18 @@ export default class EditChatroomUn extends Component {
       refresh: !this.state.refresh,
     });
 	}
+
+  saveEdit = () => {
+    const chatroom = {
+      name:this.state.name,
+      private: this.state.status,
+      roles: this.state.selectedRoles,
+      gid: this.item.data.gid,
+      cid: this.item.data.cid,
+      id: this.item.id,
+    };
+    FirebaseSvc.editChatroom(chatroom, this.successEdit());
+  }
 
   onChangeTextName = (name) => {this.setState({name, nameEdited: true});}
 

@@ -99,7 +99,6 @@ export default class JoinGroup extends Component {
                 style={{marginLeft: 10}}
                 name={"left"}
                 size={25}
-                color="#777777"
                 onPress={()=>{this.props.navigation.goBack()}}
               />
             </Button>

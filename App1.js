@@ -26,21 +26,9 @@ import Login from './src/pages/auth/Login';
 import SignUp from './src/pages/auth/SignUp';
 import NewUser from './src/pages/auth/NewUser';
 import Home from './src/pages/Home';
+import Dashboard from './src/pages/Dashboard';
 import CreateGroup from './src/pages/CreateGroup';
 import JoinGroup from './src/pages/JoinGroup';
-
-import Dashboard from './src/pages/Dashboard';
-import GroupList from './src/pages/bottom_tab_navigator/GroupList';
-import Profile from './src/pages/Profile';
-
-//##Group
-import CategoryChatroom from './src/pages/group/CategoryChatroom';
-
-//##EventTodos
-import EventTodos from './src/pages/event_todo/EventTodos';
-import CreateEvent from './src/pages/event_todo/CreateEvent';
-import CreateTodo from './src/pages/event_todo/CreateTodo';
-
 //##TabNavigator
 //->Planner
 import Planner from './src/pages/planner/Planner';
@@ -67,24 +55,25 @@ import RegistrationForms from './src/pages/registration_forms/RegistrationForms'
 
 //##Drawer
 import drawerMenuComponents from './src/assets/components/drawerMenuComponents';
-import Chatroom from './src/pages/group/chatroom/Chatroom';
-import CreateChatroom from './src/pages/group/CreateChatroom';
-import CreateCategory from './src/pages/group/CreateCategory';
-import CreateChatroomUn from './src/pages/group/CreateChatroomUn';
+import Chatroom from './src/pages/chatroom/Chatroom';
+import CreateChatroom from './src/pages/chatroom/CreateChatroom';
+import Profile from './src/pages/drawer/Profile';
+import CreateCategory from './src/pages/chatroom/CreateCategory';
+import CreateChatroomUn from './src/pages/chatroom/CreateChatroomUn';
 
 //##Settings
-import Setting from './src/pages/group/settings/Setting';
-import EditGroup from './src/pages/group/settings/EditGroup';
-import Category from './src/pages/group/settings/Category';
-import EditCategory from './src/pages/group/settings/EditCategory';
-import EditChatroom from './src/pages/group/settings/EditChatroom';
-import EditChatroomUn from './src/pages/group/settings/EditChatroomUn';
-import Members from './src/pages/group/settings/Members';
-import EditMember from './src/pages/group/settings/EditMember';
-import Role from './src/pages/group/settings/Role';
-import CreateRole from './src/pages/group/settings/CreateRole';
-import EditRole from './src/pages/group/settings/EditRole';
-import InvitationCode from './src/pages/group/settings/InvitationCode';
+import Setting from './src/pages/drawer/settings/Setting';
+import EditGroup from './src/pages/drawer/settings/EditGroup';
+import Category from './src/pages/drawer/settings/Category';
+import EditCategory from './src/pages/drawer/settings/EditCategory';
+import EditChatroom from './src/pages/drawer/settings/EditChatroom';
+import EditChatroomUn from './src/pages/drawer/settings/EditChatroomUn';
+import Members from './src/pages/drawer/settings/Members';
+import EditMember from './src/pages/drawer/settings/EditMember';
+import Role from './src/pages/drawer/settings/Role';
+import CreateRole from './src/pages/drawer/settings/CreateRole';
+import EditRole from './src/pages/drawer/settings/EditRole';
+import InvitationCode from './src/pages/drawer/settings/InvitationCode';
 //->Statistic
 import Statistic from './src/pages/drawer/Statistic';
 //->Achievement
@@ -130,6 +119,25 @@ const AbsenStack = createStackNavigator({
     navigationOptions: ({navigation}) => {
       return {
         header: null,
+        // headerTitle: 'Absen',
+        // headerLeft: (
+        //   <Icon
+        //     style={{marginLeft: 15}}
+        //     name={"menu"}
+        //     size={30}
+        //     color="#298CFB"
+        //     onPress={()=>{navigation.dispatch(DrawerActions.toggleDrawer());}}
+        //   />
+        // ),
+        // headerRight: (
+        //   <Icon
+        //     style={{marginRight: 15}}
+        //     name={"add"}
+        //     size={30}
+        //     color="#298CFB"
+        //     onPress={()=>{navigation.navigate("CreateAbsen")}}
+        //   />
+        // )
       }
     }
   },
@@ -205,6 +213,105 @@ NotesStack.navigationOptions = ({navigation}) => {
   }
 }
 
+const HomeTabNavigator = createBottomTabNavigator({
+  //Paling atas = first page
+    Notes: NotesStack,
+    Planner: PlannerStack,
+    Absen: AbsenStack,
+    Evaluation: Evaluation,
+    Vote: Vote,
+    RegistrationFroms: RegistrationForms,
+  }, {
+    navigationOptions: ({navigation}) => {
+      const {routeName} = navigation.state.routes[navigation.state.index];
+      return {
+        header: null,
+        headerTitle: routeName,
+      }
+    },
+  });
+
+const HomeStackNavigator = createStackNavigator({
+      // HomeTabNavigator: HomeTabNavigator,
+      Dashboard: {
+        screen: Dashboard,
+        navigationOptions: ({navigation}) => {
+          return {
+            header: null,
+          }
+        },
+      },
+      CreateGroup: {
+        screen: CreateGroup,
+        navigationOptions: ({navigation}) => {
+          return {
+            header: null,
+          }
+        }
+      },
+      JoinGroup: {
+        screen: JoinGroup,
+        navigationOptions: ({navigation}) => {
+          return {
+            header: null,
+          }
+        },
+      }
+    }, {
+      defaultNavigationOptions: ({navigation}) => {
+        return {
+          headerLeft: (
+            <Icon
+              style={{marginLeft: 15}}
+              name="menu"
+              onPress={()=>{navigation.dispatch(DrawerActions.toggleDrawer());}}
+            />
+          ),
+          gesturesEnabled: false,
+        }
+      }
+    }
+  );
+
+const ChatroomStackNavigator = createStackNavigator({
+  Chatroom: {
+    screen: Chatroom,
+  },
+  CreateCategory: {
+    screen: CreateCategory,
+  },
+  CreateChatroom: {
+    screen: CreateChatroom,
+  },
+  CreateChatroomUn: {
+    screen: CreateChatroomUn,
+  },
+}, {
+  defaultNavigationOptions: ({navigation}) => {
+    return {
+      header: null,
+    }
+  }
+});
+
+const ProfileStackNavigator = createStackNavigator({
+  Profile: {
+    screen: Profile,
+  },
+}, {
+  defaultNavigationOptions: ({navigation}) => {
+    return {
+      headerLeft: (
+        <Icon
+          style={{marginLeft: 15}}
+          name="menu"
+          onPress={()=>{navigation.dispatch(DrawerActions.toggleDrawer());}}
+        />
+      )
+    }
+  }
+});
+
 const SettingStackNavigator = createStackNavigator({
   Setting: {
     screen: Setting,
@@ -250,125 +357,35 @@ const SettingStackNavigator = createStackNavigator({
   }
 });
 
-const GroupStack = createStackNavigator({
-  CategoryChatroom: {
-    screen: CategoryChatroom,
+//Ubah Custom Drawer
+const AppDrawerNavigator = createDrawerNavigator({
+  Home: {
+    screen: HomeStackNavigator,
   },
-  CreateChatroom: {
-    screen: CreateChatroom,
-  },
-  CreateChatroomUn: {
-    screen: CreateChatroomUn,
-  },
-  CreateCategory: {
-    screen: CreateCategory,
-  },
-  Chatroom: {
-    screen: Chatroom,
-  },
+  // Setting: {
+  //   screen: Setting,
+  // },
+  // EditGroup: {
+  //   screen: EditGroup,
+  // },
   Setting: {
     screen: SettingStackNavigator,
   },
-}, {
-  defaultNavigationOptions: ({navigation}) => {
-    return {
-      header: null,
-    }
-  },
-  transitionConfig: () => ({
-    transitionSpec: {
-      duration: 0,  // Set the animation duration time as 0 !!
-    },
-  }),
-});
-
-const EventStack = createStackNavigator({
-  EventTodos: {
-    screen: EventTodos,
-  },
-  CreateEvent: {
-    screen: CreateEvent,
-  },
-  CreateTodo: {
-    screen: CreateTodo,
-  },
-}, {
-  defaultNavigationOptions: ({navigation}) => {
-    return {
-      header: null,
-    }
-  },
-  transitionConfig: () => ({
-    transitionSpec: {
-      duration: 0,  // Set the animation duration time as 0 !!
-    },
-  }),
-});
-
-GroupStack.navigationOptions = ({navigation}) => {
-  let tabBarVisible = true;
-  if (navigation.state.index > 0) {
-    tabBarVisible = false;
-  }
-  return {
-    tabBarVisible
-  };
-};
-
-const GroupBottomNavigator = createBottomTabNavigator({
-  Chatroom: {
-    screen: GroupStack,
-  },
-  Dashboard: {
-    screen: EventStack,
-  },
-});
-
-const GroupListStack = createStackNavigator({
-  GroupList: {
-    screen: GroupList,
-  },
-  CreateGroup: {
-    screen: CreateGroup,
-  },
-  JoinGroup: {
-    screen: JoinGroup,
-  },
-  Group: {
-    screen: GroupBottomNavigator,
-  },
-}, {
-  defaultNavigationOptions: ({navigation}) => {
-    return {
-      header: null,
-    }
-  },
-  transitionConfig: () => ({
-    transitionSpec: {
-      duration: 0,  // Set the animation duration time as 0 !!
-    },
-  }),
-});
-
-GroupListStack.navigationOptions = ({navigation}) => {
-  let tabBarVisible = true;
-  if (navigation.state.index > 0) {
-    tabBarVisible = false;
-  }
-  return {
-    tabBarVisible
-  };
-};
-
-const AppBottomNavigator = createBottomTabNavigator({
-  Groups: {
-    screen: GroupListStack,
+  ChatroomStack: {
+    screen: ChatroomStackNavigator,
   },
   Profile: {
-    screen: Profile,
+    screen: ProfileStackNavigator,
   },
+  // Statistic: {
+  //   screen: Statistic,
+  // },
+  // Achievement: {
+  //   screen: Achievement,
+  // },
 }, {
-  initialRouteName: 'Groups'
+  contentComponent: drawerMenuComponents,
+  // mode: Platform.OS === 'ios' ? 'modal' : 'card',
 });
 
 const AuthTabs = createStackNavigator({
@@ -397,12 +414,9 @@ const RootSwitch = createSwitchNavigator({
     Loading: {
       screen: Loading,
     },
-    AppBottomNavigator: {
-      screen: AppBottomNavigator,
+    AppDrawerNavigator: {
+      screen: AppDrawerNavigator,
     },
-    // AppDrawerNavigator: {
-    //   screen: AppDrawerNavigator,
-    // },
     AuthTabs: {
       screen: AuthTabs,
     },

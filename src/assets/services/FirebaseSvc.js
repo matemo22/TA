@@ -1,5 +1,11 @@
 import firebase from 'react-native-firebase';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Platform } from 'react-native';
+// import RNFetchBlob from 'react-native-fetch-blob';
+
+// const Blob = RNFetchBlob.polyfill.Blob;
+// const fs = RNFetchBlob.fs;
+// window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
+// window.Blob = Blob;
 
 class FirebaseSvc {
   constructor() {
@@ -73,6 +79,52 @@ class FirebaseSvc {
     });
   }
 
+  // uploadGroupAvatar = async (response, gid, mime = 'application/octet-stream') =>{
+  //   return (dispatch) => {
+  //     return new Promise((resolve, reject) => {
+  //       let uri = response.uri;
+  //       const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+  //       let uploadBlob = null;
+  //
+  //       //Create a reference in firebase storage for the file
+  //       const imageRef = this.storage.ref(gid).child('avatar.png');
+  //       fs.readFile(uploadUri, 'base64')
+  //       .then((data)=>{
+  //         return Blob.build(data, {type: `${mime};BASE64`});
+  //       })
+  //       //place the blub into storage reference
+  //       .then((blob)=>{
+  //         uploadBlob = blob;
+  //         return imageRef.put(blob, {contentType: mime });
+  //       })
+  //       //from here you can get the download url of the image
+  //       //to store a reference to it in your db
+  //       .then(()=>{
+  //         uploadBlob.close();
+  //         return imageRef.getDownloadURL();
+  //       })
+  //       .then((url)=>{
+  //         resolve(url);
+  //         //this storeReference function is an optional helper
+  //         //method you can create to store a reference to the download url
+  //         //of the image in your db
+  //         storeGroupAvatarRef(url, gid);
+  //       })
+  //       .catch((error)=>{
+  //         reject(error);
+  //       });
+  //     });
+  //   }
+  // }
+  //
+  // storeGroupAvatarRef = (downloadUrl, gid) => {
+  //   const createdAt = new Date();
+  //   this.firestore.collection("avatar").doc(gid).set({
+  //     photoURL: downloadURL,
+  //     createdAt: createdAt,
+  //   });
+  // }
+
   uploadAvatar = async (response) => {
     const metadata = {
       contentType: response.type,
@@ -111,7 +163,7 @@ class FirebaseSvc {
     });
   }
 
-  createGroup = async (group, response) => {
+  createGroup = async (group, response, success_callback) => {
     let user = this.auth.currentUser;
     let members = [];
     let code = this.generateCode(6);
@@ -153,11 +205,15 @@ class FirebaseSvc {
       let refUser = this.firestore.collection("user").doc(user.uid);
       this.firestore.runTransaction(function(transaction) {
         return transaction.get(refUser).then(function(doc) {
-          var groups = doc.data().groups;
+          var groups = [];
+          if(doc.data().groups) {
+            groups = doc.data().groups;
+          }
           groups.push(docRef.id);
           transaction.update(refUser, {groups: groups});
         });
       });
+      success_callback;
     })
     .catch(function(error) {
       console.log("Error Add Group", error);
@@ -215,20 +271,60 @@ class FirebaseSvc {
     });
   }
 
-  editGroup = (group) => {
+  createEvent = (event, success_callback) => {
+    this.firestore.collection("event").add({
+      title: event.title,
+      time: event.time,
+      note: event.note,
+      reminder: event.reminder,
+      gid: event.gid,
+      time_reminder: event.time_reminder,
+      cid: event.cid,
+      roles: event.roles,
+    })
+    .then(success_callback, function(error) {
+      console.error("Failed to create Event", error);
+    });
+  }
+
+  createTodo = (todo, success_callback) => {
+    this.firestore.collection("todos").add({
+      title: todo.title,
+      gid: todo.gid,
+      cid: todo.cid,
+      roles: todo.roles,
+      todo: todo.todo,
+      completed: false,
+    })
+    .then(success_callback, function(error) {
+      console.error("Failed to create Todo", error);
+    });
+  }
+
+  editGroup = (group, success_callback) => {
     let batch = this.firestore.batch();
     let ref = this.firestore.collection("groups").doc(group.id);
     batch.update(ref, {
-      photoURL: group.photoURL,
-      name: group.name
+      name: group.name,
     });
     batch.commit()
-    .then(async () => {
-      console.log("Success update group info");
-    })
-    .catch((error) => {
-      console.log("Error Writing Data", error);
+    .then(success_callback, (error) => {
+      console.log("Error Edit Group", error);
     });
+  }
+
+  editChatroom = (chatroom, success_callback) => {
+    let batch = this.firestore.batch();
+    let ref = this.firestore.collection("chatrooms").doc(chatroom.id);
+    batch.update(ref, {
+      name: chatroom.name,
+      private: chatroom.private,
+      roles: chatroom.roles,
+    });
+    batch.commit()
+    .then(success_callback, (error)=>{
+      console.error("Error Edit Chatroom", error);
+    })
   }
 
   joinGroup = async (code) => {
@@ -358,7 +454,10 @@ class FirebaseSvc {
 
   getGroupRef = () => {
     var user = this.auth.currentUser;
-    var groupRef = this.firestore.collection("groups").where('members','array-contains',user.uid);
+    var groupRef = this.firestore
+      .collection("groups")
+      .where('members','array-contains',user.uid);
+      // .orderBy('name');
     return groupRef;
   }
 
@@ -375,6 +474,26 @@ class FirebaseSvc {
   getChatroomRef = (gid) => {
     var chatroomRef = this.firestore.collection("chatrooms").where('gid', '==', gid);
     return chatroomRef;
+  }
+
+  getEventRef = (gid) => {
+    var eventRef = this.firestore.collection("event").where('gid','==',gid);
+    return eventRef;
+  }
+
+  getAllEventRef = () => {
+    var eventRef = this.firestore.collection("event");
+    return eventRef;
+  }
+
+  getTodosRef = (gid) => {
+    var todosRef = this.firestore.collection("todos").where('gid','==',gid);
+    return todosRef;
+  }
+
+  getAllTodosRef = () => {
+    var todosRef = this.firestore.collection("todos");
+    return todosRef;
   }
 
   getRoleRef = (gid) => {

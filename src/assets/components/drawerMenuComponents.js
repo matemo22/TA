@@ -215,6 +215,15 @@ export default class drawerMenuComponents extends Component {
     }
   );
 
+  navigateToScreenStack = (route) => (
+    () => {
+      const pushAction = StackActions.push({
+        routeName: route,
+      });
+      this.props.navigation.dispatch(pushAction);
+    }
+  );
+
   logout = async () => {
     await FirebaseSvc.logout(this.logoutSuccess, this.logoutFailed);
   }
@@ -237,7 +246,7 @@ export default class drawerMenuComponents extends Component {
     let temp = [];
     if(!item.data.cid) {
       temp.push(
-        <ListItem onPress={this.navigateToScreen("Chatroom")} key={item.id}>
+        <ListItem onPress={this.navigateToScreenStack("Chatroom")} key={item.id}>
           <Icon name="book"/>
           <Text style={styles.deactiveListItemTextIcon}>{item.data.name}</Text>
         </ListItem>
@@ -282,7 +291,7 @@ export default class drawerMenuComponents extends Component {
           for (var i = 0; i < chatroom.length; i++) {
             if(chatroom[i].data.cid==item.id){
               temp.push(
-                <ListItem onPress={this.navigateToScreen("Chatroom")} key={chatroom[i].id}>
+                <ListItem onPress={this.navigateToScreenStack("Chatroom")} key={chatroom[i].id}>
                   <Icon name="book"/>
                   <Text style={styles.deactiveListItemTextIcon}>{chatroom[i].data.name}</Text>
                 </ListItem>
@@ -319,7 +328,7 @@ export default class drawerMenuComponents extends Component {
             if(chatroom[i].data.private) {
               if(role.some(r=>chatroom[i].data.roles.includes(r.id))) {
                 temp.push(
-                  <ListItem onPress={this.navigateToScreen("Chatroom")} key={chatroom[i].id}>
+                  <ListItem onPress={this.navigateToScreenStack("Chatroom")} key={chatroom[i].id}>
                     <Icon name="book"/>
                     <Text style={styles.deactiveListItemTextIcon}>{chatroom[i].data.name}</Text>
                     <Icon name="lock" color="#777777" style={{marginLeft: 3}}/>
@@ -329,7 +338,7 @@ export default class drawerMenuComponents extends Component {
             }
             else {
               temp.push(
-                <ListItem onPress={this.navigateToScreen("Chatroom")} key={chatroom[i].id}>
+                <ListItem onPress={this.navigateToScreenStack("Chatroom")} key={chatroom[i].id}>
                   <Icon name="book"/>
                   <Text style={styles.deactiveListItemTextIcon}>{chatroom[i].data.name}</Text>
                 </ListItem>

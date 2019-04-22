@@ -1,11 +1,13 @@
 /* @flow */
 
 import React, { Component } from 'react';
+import { View } from 'react-native';
 import {
   Container,
 	Header,
 	Title,
 	Content,
+  Footer,
 	Button,
 	Body,
 	Text,
@@ -20,10 +22,11 @@ import {
   Thumbnail,
   Drawer,
 } from 'native-base';
-import { GiftedChat } from 'react-native-gifted-chat';
-import firebase from 'react-native-firebase';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { DrawerActions } from 'react-navigation';
+import { GiftedChat, Actions } from 'react-native-gifted-chat';
+import FirebaseSvc from '../../../assets/services/FirebaseSvc';
+import Icon from 'react-native-vector-icons/AntDesign';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import ImagePicker from 'react-native-image-picker';
 
 export default class Chatroom extends Component {
 
@@ -45,6 +48,7 @@ export default class Chatroom extends Component {
 
     this.state = {
       messages:[],
+      sendImage:'',
     };
   }
 
@@ -96,29 +100,66 @@ export default class Chatroom extends Component {
     }))
   }
 
+  renderActions(props) {
+    const icon = () => {
+      return(
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Icon name="picture" size={20}/>
+        </View>
+      )
+    }
+    return(
+      <Actions
+        {...props}
+        icon={icon}
+      />
+    )
+  }
+
+  handleChoosePhoto = () => {
+		const options = {
+			noData: true,
+		};
+		ImagePicker.launchImageLibrary(options, response => {
+			if(response.uri) {
+				// let uploadUrl = FirebaseSvc.uploadAvatar(response);
+				this.setState({ sendImage: response });
+			}
+		});
+	}
+
   render() {
     // console.log("This", this);
     return (
       <Container>
-        <Header>
-          <Left>
+      <Header style={{borderBottomWidth: 0}}>
+        <Left>
+          <Button transparent>
             <Icon
               style={{marginLeft: 10}}
-              name={"menu"}
-              size={30}
-              color="#298CFB"
-              onPress={()=>{this.props.navigation.dispatch(DrawerActions.toggleDrawer());}}
+              name={"left"}
+              size={25}
+              onPress={()=>{this.props.navigation.goBack()}}
             />
-          </Left>
-          <Body stle={{flex: 3}}>
-            <Text>Chatroom</Text>
-          </Body>
-          <Right>
-          </Right>
-        </Header>
+          </Button>
+        </Left>
+        <Body stle={{flex: 3}}>
+        </Body>
+        <Right>
+          <Button transparent>
+            <Icon name="folder1" size={20} />
+          </Button>
+          <Button transparent>
+            <Icon name="profile" size={20} />
+          </Button>
+        </Right>
+      </Header>
         <GiftedChat
           messages={this.state.messages}
+          multiline={true}
           onSend={messages => this.onSend(messages)}
+          renderActions={this.renderActions}
+          onPressActionButton = {this.handleChoosePhoto}
           user={{
             _id: 1,
           }}

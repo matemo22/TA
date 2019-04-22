@@ -27,13 +27,13 @@ import FirebaseSvc from '../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
-export default class CreateChatroomUn extends Component {
+export default class CreateChatroom extends Component {
   constructor(props){
     super(props);
     this.unsubscribeRole = null;
-    this.group = this.props.navigation.getParam('group', []);
-		this.item = this.props.navigation.getParam('item', []);
-    console.log("Item", this.item);
+    this.group = null;
+		this.item = null;
+    // console.log("Item", this.item);
 
     this.state = {
       name:'',
@@ -48,6 +48,8 @@ export default class CreateChatroomUn extends Component {
   }
 
   componentDidMount = async () => {
+    this.group = this.props.navigation.getParam('group', []);
+		this.item = this.props.navigation.getParam('item', []);
     this.unsubscribeRole = await FirebaseSvc
       .getRoleRef(this.group.id)
       .onSnapshot(this.fetchRole);
@@ -117,11 +119,23 @@ export default class CreateChatroomUn extends Component {
   }
 
   createSuccess = () => {
+    this.setState({
+      name:'',
+      status: false,
+			refresh: false,
+			selectedRoles: [],
+      role: [],
+      nameEdited: false,
+      statusEdited: false,
+      roleEdited: false,
+    });
     Toast.show({
       text: "Create "+this.item.title+"'s Chatroom Success!",
       buttonText: "Okay!",
       duration: 2000,
     });
+    this.item = null;
+    this.group = null;
     this.props.navigation.goBack();
   }
 
@@ -152,7 +166,7 @@ export default class CreateChatroomUn extends Component {
         </Header>
         <Content>
           <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
-            <Text>{this.item.title}'s Chatroom</Text>
+            <Text>{this.item ? this.item.title+"'s Chatroom" : "Category's Chatroom"}</Text>
           </ListItem>
           <Form>
             <Item floatingLabel>

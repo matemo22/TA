@@ -1,8 +1,35 @@
 ~/Library/Android/sdk/tools/emulator -list-avds
 ~/Library/Android/sdk/tools/emulator -avd Nexus_5X_API_27
 
-
 watchman watch-del-all && rm -rf $TMPDIR/react-* && rm -rf node_modules/ && npm cache verify && npm install && npm start -- --reset-cache
+
+
+<Grid>
+  <Col>
+    <Picker
+      iosIcon={<Icon name="down-square-o" color="#757575"/>}
+      mode="dropdown"
+      placeholder="Select Group"
+      textStyle={{ color: "#757575", fontSize: 12 }}
+      selectedValue={this.state.selectedGroup}
+      onValueChange={this.onPickerGroupChange.bind(this)}>
+      <Picker.Item label="SU IMT" value="5" />
+      <Picker.Item label="Group A" value="10" />
+    </Picker>
+  </Col>
+  <Col>
+    <Picker
+      iosIcon={<Icon name="down-square-o" color="#757575"/>}
+      mode="dropdown"
+      placeholder="Select Chatroom"
+      textStyle={{ color: "#757575", fontSize: 12 }}
+      selectedValue={this.state.selectedChatroom}
+      onValueChange={this.onPickerChatroomChange.bind(this)}>
+      <Picker.Item label="Tes" value="5" />
+      <Picker.Item label="Group A" value="10" />
+    </Picker>
+  </Col>
+</Grid>
 
 onPress={()=>{navigation.push('Chatroom', {
   title: name,
@@ -81,3 +108,57 @@ if(item.data.chatrooms) {
 }
 
 <Text>{this.state.group ? this.state.group._data.name : "Name"}</Text>
+
+##EventTodo
+<List>
+  <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
+    <Left>
+      <Text>Event</Text>
+    </Left>
+    <Right>
+      { this.state.selectedGroup != '' ?
+        <Icon name="plus"
+          onPress={()=>{this.props.navigation.navigate("CreateEvent", {group: this.state.selectedGroup});}}/>
+        :
+        <View></View>
+      }
+    </Right>
+  </ListItem>
+  {this.state.event.length != 0 ?
+    <FlatList
+      data={this.state.event}
+      extraData={this.state.refresh}
+      renderItem={this._renderEvent}
+      keyExtractor={(item, index) => item.id}
+    />
+    :
+    <ListItem>
+      <Text note>No Event</Text>
+    </ListItem>
+  }
+  <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
+    <Left>
+      <Text>Todo List</Text>
+    </Left>
+    <Right>
+      { this.state.selectedGroup != '' ?
+        <Icon name="plus"
+          onPress={()=>{this.props.navigation.navigate("CreateTodo", {group: this.state.selectedGroup});}}/>
+        :
+        <View></View>
+      }
+    </Right>
+  </ListItem>
+  {this.state.todo.length != 0 ?
+    <FlatList
+      data={this.state.todo}
+      extraData={this.state.refresh}
+      renderItem={this._renderTodo}
+      keyExtractor={(item, index) => item.id}
+    />
+    :
+    <ListItem>
+      <Text note>No Todo</Text>
+    </ListItem>
+  }
+</List>

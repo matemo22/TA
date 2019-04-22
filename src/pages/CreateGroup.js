@@ -17,6 +17,7 @@ import {
 	Input,
 	Thumbnail,
   Icon,
+	Toast,
 } from 'native-base';
 import { ImageEditor, } from 'react-native';
 import FirebaseSvc from '../assets/services/FirebaseSvc';
@@ -33,27 +34,25 @@ export default class CreateGroup extends Component {
 		};
   }
 
-  returnData() {
-    this.props.navigation.state.params.returnData();
-    this.props.navigation.goBack();
-  }
-
   onPressSave = async () => {
 		if(this.state.name!='') {
 			let group = {
 				name: this.state.name,
 			}
-			await FirebaseSvc.createGroup(group, this.state.avatar);
-			this.returnData();
+			await FirebaseSvc.createGroup(group, this.state.avatar, this.createSuccess());
 		}
 		else {
 			alert("Please Input Group Name");
 		}
 	}
 
-	successUpdate = () => {
-		console.log("User Info Updated");
-		// this.props.navigation.navigate("AppDrawerNavigator");
+	createSuccess = () => {
+		Toast.show({
+      text: 'Create Group Success!',
+      buttonText: 'Okay!',
+			duration: 2000,
+    });
+		this.props.navigation.goBack();
 	}
 
   onChangeTextName = (name) => {this.setState({name});}

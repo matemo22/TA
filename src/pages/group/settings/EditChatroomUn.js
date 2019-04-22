@@ -20,20 +20,19 @@ import {
   ListItem,
   Thumbnail,
   Drawer,
-  Switch
+  Switch,
+  Toast,
 } from 'native-base';
 import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
-export default class EditChatroom extends Component {
+export default class EditChatroomUn extends Component {
   constructor(props){
     super(props);
     this.unsubscribeRole = null;
     this.item = this.props.navigation.getParam('item', []);
-    this.parent = this.props.navigation.getParam('parent', []);
-    // console.log("Item", this.item);
-    // console.log("parent", this.parent);
+
     this.state = {
       name:this.item.data.name,
       status: this.item.data.private ? true : false,
@@ -61,15 +60,10 @@ export default class EditChatroom extends Component {
         data: doc.data(),
         id: doc.id,
       });
-      if(this.parent.data.private) {
-
-      }
-      else if(this.item.data.roles && this.item.data.roles.includes(doc.id)) {
+      if(this.item.data.roles && this.item.data.roles.includes(doc.id)) {
         selectedRoles.push(doc.id);
       }
     });
-
-    // this._storeChatroomsData(chatroom);
 
     this.setState({
       role: role,
@@ -100,6 +94,27 @@ export default class EditChatroom extends Component {
       refresh: !this.state.refresh,
     });
 	}
+
+  saveEdit = () => {
+    const chatroom = {
+      name:this.state.name,
+      private: this.state.status,
+      roles: this.state.selectedRoles,
+      gid: this.item.data.gid,
+      cid: this.item.data.cid,
+      id: this.item.id,
+    };
+    FirebaseSvc.editChatroom(chatroom, this.successEdit());
+  }
+
+  successEdit = () => {
+    Toast.show({
+      text: "Edit Chatroom Success",
+      buttonText: "Okay!",
+      duration: 2000,
+    });
+    this.props.navigation.goBack();
+  }
 
   onChangeTextName = (name) => {this.setState({name, nameEdited: true});}
 
@@ -135,7 +150,7 @@ export default class EditChatroom extends Component {
               <Label>Chatroom Name</Label>
               <Input onChangeText={(name) => {this.onChangeTextName(name)}} value={this.state.name}/>
             </Item>
-            { !this.parent.data.private ?
+            { !this.item.data.private ?
               <View style={{borderBottomColor: '#F2F0F3', borderBottomWidth: 1}}>
   							<View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 16}}>
   								<Text style={{color: '#757575'}}>Private Chatroom</Text>

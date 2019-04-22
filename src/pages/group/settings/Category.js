@@ -45,20 +45,6 @@ export default class Category extends Component {
     };
   }
 
-  retrieveData = async () => {
-    try {
-      const categories = await AsyncStorage.getItem('categories');
-      const category = await JSON.parse(categories);
-      const chatrooms = await AsyncStorage.getItem('chatrooms');
-      const chatroom = await JSON.parse(chatrooms);
-      await this.setState({ category: category, chatroom: chatroom });
-      return item;
-    }
-    catch(error) {
-      console.log("Error Retrieve Data", error);
-    }
-  }
-
   componentDidMount = async () => {
     // await this.retrieveDataGroup();
     this.unsubscribeUser = await FirebaseSvc
@@ -149,7 +135,7 @@ export default class Category extends Component {
       temp.push(
         <ListItem icon
           key={item.id}
-          onPress={()=>{this.props.navigation.navigate("EditChatroomUn", {item: item})}}>
+          onPress={()=>{console.log("render2 item", item); this.props.navigation.navigate("EditChatroomUn", {item: item})}}>
           <Left>
             <Icon name="book"/>
           </Left>
@@ -205,6 +191,7 @@ export default class Category extends Component {
           for (var i = 0; i < chatroom.length; i++) {
             if(chatroom[i].data.cid==item.id){
               let chatroomData = chatroom[i];
+              let id = chatroom[i].id;
               temp.push(
                 <ListItem icon
                   key={chatroom[i].id}
@@ -239,6 +226,7 @@ export default class Category extends Component {
         for (var i = 0; i < chatroom.length; i++) {
           if(chatroom[i].data.cid==item.id){
             let chatroomData = chatroom[i];
+            let id = chatroom[i].id;
             if(chatroom[i].data.private) {
               if(role.some(r=>chatroom[i].data.roles.includes(r.id))) {
                 temp.push(
@@ -292,15 +280,13 @@ export default class Category extends Component {
             </Button>
           </Left>
           <Body stle={{flex: 3}}>
+            <Text>Category</Text>
           </Body>
           <Right>
           </Right>
         </Header>
         <Content bounces={false}>
           <List>
-            <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
-              <Text>Category</Text>
-            </ListItem>
             <ListItem icon
               style={{marginLeft: 0, backgroundColor: "#F8F8F8"}}>
               <Left></Left>

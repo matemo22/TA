@@ -14,12 +14,20 @@ YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTIm
 export default class Loading extends Component {
   constructor (props) {
     super(props);
-    this._authCheck();
+  }
+
+  componentDidMount = async () => {
+    setTimeout(()=>{
+        this._authCheck();
+      },
+      1*1000
+    );
   }
 
   _authCheck = async () => {
     const user = await FirebaseSvc.getCurrentUser();
-    this.props.navigation.navigate(user ? 'AppDrawerNavigator' : 'AuthTabs');
+    // this.props.navigation.navigate(user ? 'AppDrawerNavigator' : 'AuthTabs');
+    this.props.navigation.navigate(user ? 'AppBottomNavigator' : 'AuthTabs');
   }
 
   render() {

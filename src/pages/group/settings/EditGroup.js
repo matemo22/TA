@@ -20,6 +20,7 @@ import {
   ListItem,
   Thumbnail,
   Drawer,
+  Toast,
 } from 'native-base';
 import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -29,7 +30,7 @@ export default class EditGroup extends Component {
   constructor(props){
     super(props);
     this.group = this.props.navigation.getParam('group', []);
-    console.log("Group",this.group);
+
     this.state = {
       name: this.group._data.name,
       url: this.group._data.photoURL,
@@ -50,18 +51,23 @@ export default class EditGroup extends Component {
 	}
 
   saveEdit = () => {
-    let newGroup = {};
-    if(this.state.nameEdited && this.state.photoEdited) {
-      newGroup.name = this.state.name;
-      newGroup.photoURL = this.state.avatar;
-      newGroup.id = this.group.id;
+    const newGroup = {
+      id: this.group.id,
+      name: this.state.name,
+    };
+    if(this.state.photoEdited) {
+      FirebaseSvc.deleteGroupPhoto(this.group.id, this.state.avatar);
     }
-    else if(this.state.nameEdited) {
+    FirebaseSvc.editGroup(newGroup, this.updateSuccess());
+  }
 
-    }
-    else if(this.state.photoEdited) {
-
-    }
+  updateSuccess = () => {
+    Toast.show({
+      text: "Group Updated",
+      buttonText: "Okay!",
+      duration: 2000,
+    });
+    this.props.navigation.goBack();
   }
 
   onChangeTextName = (name) => {this.setState({name, nameEdited: true});}

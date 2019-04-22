@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import { View, AsyncStorage } from 'react-native';
+import { NavigationActions } from 'react-navigation';
 import {
   Container,
 	Header,
@@ -38,23 +39,8 @@ export default class Setting extends Component {
     };
   }
 
-  retrieveDataGroup = async () => {
-    try {
-      const group = await AsyncStorage.getItem('group');
-      const item = await JSON.parse(group);
-      if(item) {
-        await this.setState({ group: item, doc: item.doc });
-      }
-      return item;
-    }
-    catch(error) {
-      console.log("Error Retrieve Data", error);
-    }
-  }
-
   componentDidMount = async () => {
-    let group = await this.retrieveDataGroup();
-    var getRef = await FirebaseSvc.getGroupRefById(this.state.group.id);
+    var getRef = await FirebaseSvc.getGroupRefById(this.group.id);
     this.unsubscribe = getRef.onSnapshot(this.fetchGroup);
   }
 
@@ -83,8 +69,7 @@ export default class Setting extends Component {
                 style={{marginLeft: 10}}
                 name={"left"}
                 size={25}
-                color="#777777"
-                onPress={()=>{this.props.navigation.navigate("Dashboard")}}
+                onPress={()=>{this.props.navigation.dispatch(NavigationActions.back())}}
               />
             </Button>
           </Left>

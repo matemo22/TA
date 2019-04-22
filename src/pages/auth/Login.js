@@ -51,7 +51,7 @@ export default class Login extends Component {
 
 	loginSuccess = () => {
 		console.log("Login Successful, navigate to Home.");
-		this.props.navigation.navigate("Home");
+		this.props.navigation.navigate("Dashboard");
 	}
 
 	loginFailed = () => {
