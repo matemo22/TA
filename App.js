@@ -266,6 +266,9 @@ const GroupStack = createStackNavigator({
   Chatroom: {
     screen: Chatroom,
   },
+  Notes: {
+    screen: NotesStack,
+  },
   Setting: {
     screen: SettingStackNavigator,
   },
@@ -291,6 +294,9 @@ const EventStack = createStackNavigator({
   },
   CreateTodo: {
     screen: CreateTodo,
+  },
+  Notes: {
+    screen: NotesStack,
   },
 }, {
   defaultNavigationOptions: ({navigation}) => {

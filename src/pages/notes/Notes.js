@@ -22,16 +22,17 @@ import {
   Row,
   Form,
   Item,
-  Input
+  Input,
+  ActionSheet,
 } from 'native-base';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { DrawerActions } from 'react-navigation';
+import Icon from 'react-native-vector-icons/AntDesign';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import { NavigationActions } from 'react-navigation';
 import ViewMoreText from 'react-native-view-more-text';
 import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
 import TimeAgo from 'react-native-timeago';
 import FirebaseSvc from '../../assets/services/FirebaseSvc';
 
-var BUTTONS = ["Option 0", "Option 1", "Option 2"];
 export default class Notes extends Component {
   constructor(props) {
     super(props);
@@ -43,26 +44,28 @@ export default class Notes extends Component {
     }
   }
 
-  goToPage = () => {
-    this.props.navigation.navigate("Profile");
-  }
-
   renderViewMore(onPress){return(null)}
   renderViewLess(onPress){return(null)}
 
-  _menu=null;
-
-  setMenuRef = ref => {
-    this._menu = ref;
-  };
-
-  hideMenu = () => {
-    this._menu.hide();
-  };
-
-  showMenu = () => {
-    this._menu.show();
-  };
+  showMenu = (item) => {
+    var BUTTONS = ["Edit", "Delete", "Cancel"];
+    var DESTRUCTIVE_INDEX = 1;
+    var CANCEL_INDEX = 2;
+    ActionSheet.show(
+    {
+      options: BUTTONS,
+      destructiveButtonIndex: DESTRUCTIVE_INDEX,
+      cancelButtonIndex: CANCEL_INDEX,
+    },
+    (buttonIndex) => {
+      if(buttonIndex == 0) {
+        this.props.navigation.navigate("CreateNotes", {item: item});
+      }
+      else if(buttonIndex == 1) {
+        console.log("Delete Notes");
+      }
+    });
+  }
 
   _renderItem = ({item}) => {
     return (
@@ -81,7 +84,7 @@ export default class Notes extends Component {
               ref={this.setMenuRef}
               button={
                 <Button transparent onPress={this.showMenu}>
-                  <Icon
+                  <MaterialIcon
                     name={"more-horiz"}
                     size={30}
                     color="#87838B"
@@ -110,32 +113,14 @@ export default class Notes extends Component {
               <Col>
                 <Button
                   transparent
-                  onPress={()=>{console.log("Like");}}
-                  style={{justifyContent: 'center', alignItems: 'center'}}>
-                  <Icon name="thumb-up" />
-                  <Text style={{color: '#87838B'}}>Like</Text>
-                </Button>
-              </Col>
-              <Col>
-                <Button
-                  transparent
                   onPress={()=>{console.log("Comment");}}
                   style={{justifyContent: 'center', alignItems: 'center'}}>
-                  <Icon name="comment" />
+                  <MaterialIcon name="comment" />
                   <Text style={{color: '#87838B'}}>Comment</Text>
                 </Button>
               </Col>
             </Grid>
           </Body>
-        </CardItem>
-        <CardItem bordered>
-          <Left>
-            <Icon name="thumb-up" color="#298CFB"/>
-            <Text note>{item.like} likes</Text>
-          </Left>
-          <Right>
-            <Text note>{item.comment} comments</Text>
-          </Right>
         </CardItem>
       </Card>
     );
@@ -148,23 +133,15 @@ export default class Notes extends Component {
           <Left>
             <Icon
               style={{marginLeft: 10}}
-              name={"menu"}
-              size={30}
-              color="#298CFB"
-              onPress={()=>{this.props.navigation.dispatch(DrawerActions.toggleDrawer());}}
+              name={"left"}
+              size={25}
+              onPress={()=>{this.props.navigation.dispatch(NavigationActions.back())}}
             />
           </Left>
           <Body stle={{flex: 3}}>
             <Text>Notes</Text>
           </Body>
           <Right>
-            <Icon
-              style={{marginRight: 5}}
-              name={"add"}
-              size={30}
-              color="#298CFB"
-              onPress={()=>{this.props.navigation.navigate("CreateNotes")}}
-            />
           </Right>
         </Header>
         <Content>

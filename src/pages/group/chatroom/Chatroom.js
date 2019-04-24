@@ -22,7 +22,7 @@ import {
   Thumbnail,
   Drawer,
 } from 'native-base';
-import { GiftedChat, Actions } from 'react-native-gifted-chat';
+import { GiftedChat, Actions, Composer } from 'react-native-gifted-chat';
 import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -100,6 +100,17 @@ export default class Chatroom extends Component {
     }))
   }
 
+  renderComposer(props) {
+    console.log('props',props);
+    return (
+      <Composer
+         {...props}
+         placeholder={'Type a message...'}
+         placeholderColor={'#BCBCBC'}
+      />
+    );
+  }
+
   renderActions(props) {
     const icon = () => {
       return(
@@ -159,6 +170,7 @@ export default class Chatroom extends Component {
           multiline={true}
           onSend={messages => this.onSend(messages)}
           renderActions={this.renderActions}
+          renderComposer={props => this.renderComposer(props)}
           onPressActionButton = {this.handleChoosePhoto}
           user={{
             _id: 1,

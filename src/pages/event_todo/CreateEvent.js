@@ -36,7 +36,8 @@ export default class CreateEvent extends Component {
   constructor(props){
     super(props);
     this.unsubscribeRole = null;
-		this.item = this.props.navigation.getParam('item', {empty: true});
+		this.group = this.props.navigation.getParam('group', {empty: true});
+    this.item = this.props.navigation.getParam('item', {empty: true});
 
     this.state = {
       name:'',
@@ -50,9 +51,11 @@ export default class CreateEvent extends Component {
       date: '',
 			selectedRoles: [],
       selectedTime: '',
-      selectedGroup: '',
-      selectedChatroom: '',
+      selectedCategoryId: this.item.id || '',
+      selectedCategory: this.item || '',
+      category: [],
       role: [],
+      availableRole: [],
       group: [],
       chatroom: [],
       nameEdited: false,
@@ -63,22 +66,48 @@ export default class CreateEvent extends Component {
 
   componentDidMount = async () => {
     this._convert(new Date());
+    this.unsubscribeCategory = await FirebaseSvc
+      .getCategoryRef(this.group.id)
+      .onSnapshot(this.fetchCategory);
     this.unsubscribeRole = await FirebaseSvc
-      .getRoleRef(this.item.data.gid)
+      .getRoleRef(this.group.id)
       .onSnapshot(this.fetchRole);
   }
 
   componentWillUnmount = () => {
     this.unsubscribeRole();
+    this.unsubscribeCategory();
+  }
+
+  fetchCategory = (querySnapshot) => {
+    let category = [];
+    querySnapshot.forEach( (doc) => {
+      category.push({
+        doc: doc,
+        data: doc.data(),
+        id: doc.id,
+        title: doc.data().name,
+      });
+    });
+    this.setState({
+      category: category,
+      refresh: !this.state.refresh,
+    });
   }
 
   fetchRole = (querySnapshot) => {
     let role = [];
     let availableRole = [];
-    let selectedRoles = [];
-    let exist = (this.item.data.roles.length != 0);
+    let item = this.state.selectedCategory;
+    let exist = false;
+    if(item.empty) {
+      exist = false;
+    }
+    else {
+      exist = (this.state.selectedCategory.data.roles.length != 0);
+    }
     querySnapshot.forEach( (doc) => {
-      if(exist && this.item.data.roles.includes(doc.id)) {
+      if(exist && item.data.roles.includes(doc.id)) {
         availableRole.push({
           doc: doc,
           data: doc.data(),
@@ -92,8 +121,8 @@ export default class CreateEvent extends Component {
       });
     });
     this.setState({
-      role: exist ? availableRole : role,
-      selectedRoles: selectedRoles,
+      role: role,
+      availableRole: exist ? availableRole : role,
       refresh: !this.state.refresh,
     });
   }
@@ -127,16 +156,32 @@ export default class CreateEvent extends Component {
     });
   }
 
-  onPickerGroupChange = (value: string) => {
+  onPickerCategoryChange = (id) => {
+    let value = this.state.category.find(item => item.id === id);
+    if(!value) {
+      value = {empty: true};
+    }
+    let availableRole = [];
+    let role = [];
+    let exist = false;
+    if(value.empty) {
+      exist = false;
+    }
+    else {
+      exist = (value.data.roles.length != 0);
+    }
+    for (var i = 0; i < this.state.role.length; i++) {
+      if(exist && value.data.roles.includes(this.state.role[i].id)) {
+        availableRole.push(this.state.role[i]);
+      }
+      role.push(this.state.role[i]);
+    }
     this.setState({
-      selectedGroup: value,
+      selectedCategory: value,
+      selectedCategoryId: id,
+      availableRole: exist ? availableRole : role,
     });
-  }
 
-  onPickerChatroomChange = (value: string) => {
-    this.setState({
-      selectedChatroom: value,
-    });
   }
 
 	onSwitchRolesPress(id) {
@@ -180,6 +225,7 @@ export default class CreateEvent extends Component {
 		else minute = minutes;
 		var hourText = hour+":"+minute;
 		this.setState({
+      date: date,
 			dateText: dateText,
 			hourText: hourText,
 		});
@@ -187,9 +233,6 @@ export default class CreateEvent extends Component {
 
   _handleDatePicked = (date) => {
     this._hideDateTimePicker();
-		this.setState({
-			date: date,
-		});
 		this._convert(date);
   };
 
@@ -199,9 +242,9 @@ export default class CreateEvent extends Component {
       time: this.state.date,
       note: this.state.note,
       reminder: this.state.reminder,
-      gid: this.item.data.gid,
+      gid: this.group.id,
       time_reminder: this.state.selectedTime,
-      cid: this.item.id || '',
+      cid: this.state.selectedCategory.id || '',
       roles: this.state.selectedRoles,
     };
     FirebaseSvc.createEvent(event, this.createSuccess())
@@ -228,7 +271,6 @@ export default class CreateEvent extends Component {
       </View>
     )
   }
-
 
   render() {
     return (
@@ -286,8 +328,24 @@ export default class CreateEvent extends Component {
                 }}
               />
             </View>
-
-						<View style={{borderBottomColor: '#F2F0F3', borderBottomWidth: 1}}>
+            <View style={{marginLeft: 16, marginRight: 16, borderBottomColor: '#F2F0F3', borderBottomWidth: 1, paddingBottom: 16}}>
+              <Text style={{color: '#757575'}}>Select Category</Text>
+              <Picker
+                iosIcon={<Icon name="down-square-o" color="#757575"/>}
+                mode="dropdown"
+                placeholder="Uncategorized"
+                textStyle={{ color: "#757575", fontSize: 12 }}
+                selectedValue={this.state.selectedCategoryId}
+                onValueChange={this.onPickerCategoryChange.bind(this)}>
+                <Picker.Item label="Uncategorized" value={{empty: true}} />
+                {this.state.category.map(item => {
+                  return (
+                    <Picker.Item key={item.id} label={item.data.name} value={item.id} />
+                  )
+                })}
+              </Picker>
+            </View>
+						<View style={{marginTop: 16, borderBottomColor: '#F2F0F3', borderBottomWidth: 1}}>
 							<View style={{flexDirection: 'row', justifyContent: 'space-between', marginLeft: 16, marginRight: 16, marginBottom: 16}}>
 								<Text style={{color: '#757575'}}>REMINDER</Text>
 								<Switch
@@ -306,25 +364,25 @@ export default class CreateEvent extends Component {
                   style={{textTransform: 'uppercase', fontSize: 12, color: '#757575'}}>
                   Set Time to get Reminder
                 </Text>
-                  <Picker
-                    iosIcon={<Icon name="down-square-o" color="#757575"/>}
-                    mode="dropdown"
-                    placeholder="Remind me"
-                    textStyle={{ color: "#757575", fontSize: 12 }}
-                    selectedValue={this.state.selectedTime}
-                    onValueChange={this.onPickerReminderChange.bind(this)}>
-                    <Picker.Item label="5 mins before event" value="5" />
-                    <Picker.Item label="10 mins before event" value="10" />
-                    <Picker.Item label="1 hour before event" value="60" />
-                    <Picker.Item label="2 hours before event" value="120" />
-                    <Picker.Item label="12 hours before event" value="720" />
-                    <Picker.Item label="1 day before event" value="1440" />
-                  </Picker>
+                <Picker
+                  iosIcon={<Icon name="down-square-o" color="#757575"/>}
+                  mode="dropdown"
+                  placeholder="Remind me"
+                  textStyle={{ color: "#757575", fontSize: 12 }}
+                  selectedValue={this.state.selectedTime}
+                  onValueChange={this.onPickerReminderChange.bind(this)}>
+                  <Picker.Item label="5 mins before event" value="5" />
+                  <Picker.Item label="10 mins before event" value="10" />
+                  <Picker.Item label="1 hour before event" value="60" />
+                  <Picker.Item label="2 hours before event" value="120" />
+                  <Picker.Item label="12 hours before event" value="720" />
+                  <Picker.Item label="1 day before event" value="1440" />
+                </Picker>
 							</View>
 							:
 							<View></View>
 						}
-            { this.item && !this.item.empty ?
+            { this.group && !this.group.empty ?
               <View>
                 <View style={{marginTop: 16, borderBottomColor: '#F2F0F3', borderBottomWidth: 1}}>
     							<View style={{flexDirection: 'row', justifyContent: 'space-between', marginLeft: 16, marginRight: 16, marginBottom: 16}}>
@@ -346,7 +404,7 @@ export default class CreateEvent extends Component {
                       Who can see this Event?
                     </Text>
                     <FlatList
-  										data={this.state.role}
+  										data={this.state.availableRole}
   			              extraData={this.state.refresh}
   										keyExtractor={item => ""+item.id}
   										renderItem={this.renderRole}

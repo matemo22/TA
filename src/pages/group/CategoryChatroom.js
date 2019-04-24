@@ -25,7 +25,7 @@ import {
 } from 'native-base';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { DrawerActions } from 'react-navigation';
+import { NavigationActions } from 'react-navigation';
 import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
 import FirebaseSvc from '../../assets/services/FirebaseSvc';
 import { Col, Row, Grid } from "react-native-easy-grid";
@@ -266,7 +266,7 @@ export default class CategoryChatroom extends Component {
                 style={{marginLeft: 10}}
                 name={"left"}
                 size={25}
-                onPress={()=>{this.props.navigation.goBack()}}
+                onPress={()=>{this.props.navigation.dispatch(NavigationActions.back())}}
               />
             </Button>
           </Left>

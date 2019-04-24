@@ -244,7 +244,7 @@ export default class EventTodos extends Component {
             </Col>
             <Col style={{alignItems: 'flex-end', justifyContent: 'center'}}>
               <View style={{flexDirection: 'row'}}>
-                {node.opened ? <Icon style={{marginRight: 10}} name="plus" onPress={()=>{this.showActionSheet(node.doc)}}/> : <View></View>}
+                <Icon style={{marginRight: 10}} name="plus" onPress={()=>{this.showActionSheet(node.doc)}}/>
                 <Icon name={node.opened ? "up" : "down"} style={{marginRight: 10}}/>
               </View>
             </Col>
@@ -307,7 +307,7 @@ export default class EventTodos extends Component {
     }
   }
 
-  showActionSheet = (item) => {
+  showActionSheet = (item = {empty: true}) => {
     var BUTTONS = ["Create Event", "Create Todos", "Cancel"];
     var CANCEL_INDEX = 2;
     ActionSheet.show(
@@ -317,10 +317,10 @@ export default class EventTodos extends Component {
     },
     (buttonIndex) => {
       if(buttonIndex == 0) {
-        this.props.navigation.navigate("CreateEvent", {item: item});
+        this.props.navigation.navigate("CreateEvent", {group: this.group, item: item});
       }
       else if(buttonIndex == 1) {
-        this.props.navigation.navigate("CreateTodo", {item: item});
+        this.props.navigation.navigate("CreateTodo", {group: this.group, item: item});
       }
     });
   }
@@ -374,10 +374,17 @@ export default class EventTodos extends Component {
           </Right>
         </Header>
         <Content bounces={false}>
+          <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
+            <Left>
+              <Text>Event & Todos</Text>
+            </Left>
+            <Right>
+              <Text onPress={()=>{this.showActionSheet()}}>Add</Text>
+            </Right>
+          </ListItem>
           <NestedListView
             data={this.formatData()}
             getChildrenName={(node) => 'data'}
-            onNodePressed={(node) => {console.log('Selected node', node)}}
             extraData={this.state.refresh}
             renderNode={this.renderNode}
           />
@@ -391,11 +398,6 @@ const styles = StyleSheet.create({
   level1: {
     backgroundColor: "#F8F8F8",
     borderBottomWidth: 1,
-    borderBottomColor: "#777777",
+    borderBottomColor: "#EEEEEE",
   },
-  level2: {
-    backgroundColor: "#F0EFF5",
-    borderBottomWidth: 1,
-    borderBottomColor: "#777777",
-  }
 });
