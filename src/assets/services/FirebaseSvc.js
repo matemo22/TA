@@ -54,13 +54,18 @@ class FirebaseSvc {
   login = async (user, success_callback, failed_callback) => {
     await this.auth
     .signInWithEmailAndPassword(user.email, user.password)
-    .then(success_callback, failed_callback);
+    .then(success_callback, function(error){
+      console.log("error login", error);
+    });
   }
 
-  createAccount = async (user, success_callback, failed_callback) => {
+  createAccount = async (user, success_callback) => {
+    console.log("User", user);
     await this.auth
     .createUserWithEmailAndPassword(user.email, user.password)
-    .then(success_callback, failed_callback);
+    .then(success_callback, function(error) {
+      console.error("error create account", error);
+    });
   }
 
   createUser = () => {

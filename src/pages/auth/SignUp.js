@@ -35,15 +35,12 @@ export default class SignUp extends Component {
 	onPressCreate = async () => {
 		if(this.state.email!='' && this.state.password!='' && this.state.confPassword!='')
 		{
-			try {
-				const user = {
-					// name: this.state.name,
+			if(this.state.password == this.state.confPassword) {
+				let user = {
 					email: this.state.email,
 					password: this.state.password,
 				};
-				const created = await FirebaseSvc.createAccount(user, this.createSuccess, this.createFailed);
-			} catch({message}) {
-				console.log("Create account failed. catch error: "+message);
+				FirebaseSvc.createAccount(user, this.createSuccess);
 			}
 		}
 		else {
