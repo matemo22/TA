@@ -71,7 +71,7 @@ export default class NewUser extends Component {
 		const img = <Thumbnail large source={{uri: this.state.avatar.uri}} />;
     return (
       <Container>
-				<Header>
+				<Header style={{backgroundColor: "#F8F8F8"}}>
 					<Left>
 					</Left>
 					<Body>

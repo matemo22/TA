@@ -26,8 +26,7 @@ export default class Loading extends Component {
 
   _authCheck = async () => {
     const user = await FirebaseSvc.getCurrentUser();
-    // this.props.navigation.navigate(user ? 'AppDrawerNavigator' : 'AuthTabs');
-    this.props.navigation.navigate(user ? 'AppBottomNavigator' : 'AuthTabs');
+    this.props.navigation.navigate(user ? (user.displayName ? 'AppBottomNavigator' : 'NewUser') : 'AuthTabs');
   }
 
   render() {

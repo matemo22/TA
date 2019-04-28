@@ -42,27 +42,37 @@ export default class Login extends Component {
 	}
 
 	onPressLogin = async() => {
-		const user = {
-			email: this.state.email,
-			password: this.state.password,
-		};
-		FirebaseSvc.login(user, this.loginSuccess, this.loginFailed);
+		if(this.state.email.length!=0 && this.state.password.length!=0) {
+			const user = {
+				email: this.state.email,
+				password: this.state.password,
+			};
+			FirebaseSvc.login(user, this.loginSuccess, this.loginFailed);
+		}
+		else {
+			alert("Email or Password is Empty!");
+		}
 	}
 
 	loginSuccess = () => {
-		console.log("Login Successful, navigate to Home.");
 		this.props.navigation.navigate("AppBottomNavigator");
 	}
 
 	loginFailed = () => {
-		alert("Login Failure. Please Try Again");
+		alert("Login Failure. Please Check Your Email or Password");
 	}
 
-  signUp = () => {
-    this.props.navigation.navigate('SignUp', {
-      title: 'Sign Up',
-    });
+  onPressSignUp = () => {
+    this.props.navigation.navigate('SignUp');
   }
+
+	onChangeTextEmail = (email) => {
+		this.setState({email});
+	}
+
+	onChangeTextPassword = (password) => {
+		this.setState({password});
+	}
 
   render() {
     return (
@@ -74,11 +84,11 @@ export default class Login extends Component {
           <Form>
             <Item floatingLabel>
               <Label>Email</Label>
-              <Input onChangeText={(email) => this.setState({email})}/>
+              <Input onChangeText={this.onChangeTextEmail}/>
             </Item>
             <Item floatingLabel last>
               <Label>Password</Label>
-              <Input secureTextEntry={true} onChangeText={(password) => this.setState({password})}/>
+              <Input secureTextEntry={true} onChangeText={this.onChangeTextPassword}/>
             </Item>
           </Form>
           <Button
@@ -88,7 +98,7 @@ export default class Login extends Component {
             <Text>Login</Text>
           </Button>
           <Button
-            onPress={()=>this.signUp()}
+            onPress={()=>this.onPressSignUp()}
             style={{alignSelf:'center', marginTop:5, width: '98%', justifyContent: 'center'}}
             >
             <Text>Sign Up</Text>

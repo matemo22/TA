@@ -175,7 +175,7 @@ export default class GroupList extends Component {
   render() {
     return (
       <Container>
-        <Header style={{borderBottomWidth: 0}}>
+        <Header style={{backgroundColor: "#F8F8F8", borderBottomWidth: 0}}>
           <Left></Left>
           <Body stle={{flex: 3}}>
             <Text>Groups</Text>

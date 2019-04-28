@@ -267,7 +267,7 @@ export default class Category extends Component {
   render() {
     return (
       <Container>
-        <Header style={{borderBottomWidth: 0}}>
+        <Header style={{backgroundColor: "#F8F8F8", borderBottomWidth: 0}}>
           <Left>
             <Button transparent>
               <Icon

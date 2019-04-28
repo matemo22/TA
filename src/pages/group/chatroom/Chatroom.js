@@ -143,7 +143,7 @@ export default class Chatroom extends Component {
     // console.log("This", this);
     return (
       <Container>
-      <Header style={{borderBottomWidth: 0}}>
+      <Header style={{backgroundColor: "#F8F8F8", borderBottomWidth: 0}}>
         <Left>
           <Button transparent>
             <Icon

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "native-base": "^2.11.0",
+    "npm-upgrade": "^1.4.1",
     "react": "16.6.3",
     "react-native": "^0.58.5",
     "react-native-autogrow-textinput": "^5.2.0",

@@ -78,7 +78,7 @@ export default class EditGroup extends Component {
 		const img = <Thumbnail large source={{uri: this.state.avatar.uri}} />;
     return (
       <Container>
-        <Header style={{borderBottomWidth: 0}}>
+        <Header style={{backgroundColor: "#F8F8F8", borderBottomWidth: 0}}>
           <Left>
             <Button transparent>
               <Icon

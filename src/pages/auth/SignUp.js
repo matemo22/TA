@@ -15,12 +15,12 @@ import {
 	Label,
 	Item,
 	Input,
-	Icon,
 	Thumbnail,
 } from 'native-base';
 import { ImageEditor, } from 'react-native';
 import FirebaseSvc from '../../assets/services/FirebaseSvc';
 import ImagePicker from 'react-native-image-picker';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 export default class SignUp extends Component {
   constructor(props) {
@@ -65,20 +65,15 @@ export default class SignUp extends Component {
   render() {
     return (
       <Container>
-				<Header>
+				<Header style={{backgroundColor: "#F8F8F8"}}>
 					<Left>
-						<Button transparent onPress={()=>{this.props.navigation.goBack()}}>
-							<Icon name='arrow-back' />
-							<Text>Back</Text>
-						</Button>
+						<Icon name='left' size={30} onPress={()=>{this.props.navigation.goBack()}} />
 					</Left>
 					<Body>
 						<Text>New Account</Text>
 					</Body>
 					<Right>
-						<Button transparent onPress={()=>{this.onPressCreate()}}>
-							<Text>Create</Text>
-						</Button>
+						<Text onPress={()=>{this.onPressCreate()}}>Create</Text>
 					</Right>
 				</Header>
         <Content>

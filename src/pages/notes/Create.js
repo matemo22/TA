@@ -65,7 +65,7 @@ export default class Create extends Component {
   render() {
     return (
       <Container>
-        <Header>
+        <Header style={{backgroundColor: "#F8F8F8"}}>
           <Left>
             <Button
               transparent
