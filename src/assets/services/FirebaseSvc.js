@@ -144,11 +144,6 @@ class FirebaseSvc {
       });
       var ref = await this.firestore.collection('user').doc(user.uid);
       ref.update({photoURL: uploadedFile.downloadURL});
-      // ref.get().then(async (querySnapshot) => {
-      //   querySnapshot.forEach(async (doc) => {
-      //     this.firestore.collection('user').doc(doc.id).update({photoURL: uploadedFile.downloadURL});
-      //   });
-      // });
       console.log("Success Upload File", uploadedFile);
     })
     .catch(error => {
@@ -449,6 +444,13 @@ class FirebaseSvc {
     .delete()
     .then(success_callback, function(error) {
       console.error("Failed to delete Role", error);
+    });
+  }
+
+  sendMessage = (messages, crid) => {
+    this.firestore.collection("chats").add({
+      messages,
+      crid: crid,
     });
   }
 

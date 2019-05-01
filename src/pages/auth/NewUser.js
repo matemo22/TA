@@ -17,7 +17,6 @@ import {
 	Input,
 	Thumbnail,
 } from 'native-base';
-import { ImageEditor, } from 'react-native';
 import FirebaseSvc from '../../assets/services/FirebaseSvc';
 import ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -40,14 +39,14 @@ export default class NewUser extends Component {
 			if(this.state.avatar!='') {
 				await FirebaseSvc.uploadAvatar(this.state.avatar);
 			}
-			await FirebaseSvc.createProfile(user, this.successUpdate());
+			await FirebaseSvc.createProfile(user, this.updateSuccess());
 		}
 		else {
 			alert("Please Input Your Name");
 		}
 	}
 
-	successUpdate = () => {
+	updateSuccess = () => {
 		console.log("User Info Updated");
 		this.props.navigation.navigate("AppDrawerNavigator");
 	}

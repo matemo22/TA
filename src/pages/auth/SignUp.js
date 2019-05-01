@@ -29,22 +29,26 @@ export default class SignUp extends Component {
 			email: '',
 			password: '',
       confPassword: '',
+			samePassword: false,
 		};
 	}
 
 	onPressCreate = async () => {
 		if(this.state.email!='' && this.state.password!='' && this.state.confPassword!='')
 		{
-			if(this.state.password == this.state.confPassword) {
+			if(this.state.samePassword) {
 				let user = {
 					email: this.state.email,
 					password: this.state.password,
 				};
 				FirebaseSvc.createAccount(user, this.createSuccess);
 			}
+			else {
+				alert("Please Check Your Password and Confirm Password");
+			}
 		}
 		else {
-			alert("Data belum lengkap");
+			alert("Data is Empty!");
 		}
 	}
 
@@ -59,8 +63,20 @@ export default class SignUp extends Component {
 	}
 
 	onChangeTextEmail = (email) => {this.setState({email});}
-	onChangeTextPassword = (password) => {this.setState({password});}
-	onChangeTextConfPassword = (confPassword) => {this.setState({confPassword});}
+	onChangeTextPassword = (password) => {
+		let status = false;
+		if(password == this.state.confPassword) {
+			status = true;
+		}
+		this.setState({password, samePassword: status});
+	}
+	onChangeTextConfPassword = (confPassword) => {
+		let status = false;
+		if(this.state.password == confPassword) {
+			status = true;
+		}
+		this.setState({confPassword, samePassword: status});
+	}
 
   render() {
     return (

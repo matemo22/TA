@@ -36,15 +36,35 @@ export default class Setting extends Component {
       doc: '',
       uri: '',
       refresh: false,
+      name: this.user.displayName,
+      avatar: '',
     };
   }
 
   componentDidMount = async () => {
-
+    this.user = FirebaseSvc.getCurrentUser();
   }
 
   componentWillUnmount = () => {
 
+  }
+
+  editProfile = () => {
+    // this.props.navigation.navigate("EditProfile");
+    if(this.state.name.length!=0) {
+      let user = {
+        name: this.state.name,
+      }
+      FirebaseSvc.createProfile(user, this.editSuccess);
+    }
+  }
+
+  editSuccess = () => {
+    Toast.show({
+      text: "Update Success!",
+      buttonText: "Okay!",
+      duration: 2000
+    });
   }
 
   logout = async () => {
@@ -82,6 +102,15 @@ export default class Setting extends Component {
           <List>
             <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
               <Text>Setting</Text>
+            </ListItem>
+            <ListItem icon onPress={()=>{this.editProfile()}}>
+              <Left>
+                <Icon name="user"/>
+              </Left>
+              <Body>
+                <Text>Edit Profile</Text>
+              </Body>
+              <Right></Right>
             </ListItem>
             <ListItem icon onPress={()=>{this.logout()}}>
               <Left>

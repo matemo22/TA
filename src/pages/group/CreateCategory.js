@@ -56,7 +56,6 @@ export default class CreateCategory extends Component {
 
   fetchRole = (querySnapshot) => {
     let role = [];
-    let selectedRoles = [];
     querySnapshot.forEach( (doc) => {
       role.push({
         doc: doc,
@@ -66,7 +65,6 @@ export default class CreateCategory extends Component {
     });
     this.setState({
       role: role,
-      selectedRoles: selectedRoles,
       refresh: !this.state.refresh,
     });
   }

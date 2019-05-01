@@ -34,7 +34,7 @@ export default class CreateGroup extends Component {
 		};
   }
 
-  onPressSave = async () => {
+  onPressCreate = async () => {
 		if(this.state.name!='') {
 			let group = {
 				name: this.state.name,
@@ -85,8 +85,8 @@ export default class CreateGroup extends Component {
 						<Text>New Group</Text>
 					</Body>
 					<Right>
-						<Button transparent onPress={()=>{this.onPressSave()}}>
-							<Text>Save</Text>
+						<Button transparent onPress={()=>{this.onPressCreate()}}>
+							<Text>Create</Text>
 						</Button>
 					</Right>
 				</Header>

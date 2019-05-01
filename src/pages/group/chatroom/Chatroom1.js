@@ -71,6 +71,10 @@ export default class Chatroom extends Component {
     return this.chats.add(messages[0]);
   }
 
+  sendMessage = (messages=[]) => {
+    FirebaseSvc.sendMessage(messages[0], this.chatroom.id);
+  }
+
 	closeDrawer = () => {
 		this._drawer._root.close();
 	}
