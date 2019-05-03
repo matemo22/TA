@@ -53,7 +53,7 @@ import DetailAbsen from './src/pages/absen/Detail';
 import CreateAbsen from './src/pages/absen/Create';
 import InviteAbsen from './src/pages/absen/Invite';
 //->FileManagement
-import FileManagement from './src/pages/file_management/FileManagement';
+import FileManagement from './src/pages/group/file_management/FileManagement';
 //->Notes
 import Notes from './src/pages/notes/Notes';
 import DetailNotes from './src/pages/notes/Detail';
@@ -166,44 +166,20 @@ const AbsenStack = createStackNavigator({
 const NotesStack = createStackNavigator({
   Notes: {
     screen: Notes,
-    navigationOptions: ({navigation}) => {
-      return {
-        header: null,
-      }
-    },
   },
   DetailNotes: {
     screen: DetailNotes,
-    navigationOptions: ({navigation}) => {
-      return {
-        header: null,
-      }
-    },
   },
   CreateNotes: {
     screen: CreateNotes,
-    navigationOptions: ({navigation}) => {
-      return {
-        header: null,
-        tabBarVisible: false,
-      }
-    },
   },
 }, {
-  defaultNavigationOptions: {
-    gesturesEnabled: false
-  }
+  defaultNavigationOptions: ({navigation}) => {
+    return {
+      header: null,
+    }
+  },
 });
-
-NotesStack.navigationOptions = ({navigation}) => {
-  let tabBarVisible = true;
-  if (navigation.state.index > 0) {
-    tabBarVisible = false;
-  }
-  return {
-    tabBarVisible,
-  }
-}
 
 const SettingStackNavigator = createStackNavigator({
   Setting: {

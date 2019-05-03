@@ -22,7 +22,7 @@ import {
   Thumbnail,
   Drawer,
 } from 'native-base';
-import { GiftedChat, Actions, Composer } from 'react-native-gifted-chat';
+import { GiftedChat, Actions, Composer, SystemMessage, Send } from 'react-native-gifted-chat';
 import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -33,18 +33,10 @@ export default class Chatroom extends Component {
 
   constructor(props){
     super(props);
-    this.unsubscribe = null;
-
-    //main data
-    // const { navigation } = this.props;
-    // this.title = navigation.getParam('title', 'Chatroom');
-    // this.data = navigation.getParam('data', 'Data');
-    // this.user = firebase.auth().currentUser;
-    //
-    // //query
-    // this.chatroom = this.data.chatroom;
-    // this.chats = this.chatroom.doc(this.data.id).collection('chats');
-    // this.query = this.chats.orderBy("createdAt", "desc");
+    this.unsubscribeChat = null;
+    this.item = this.props.navigation.getParam('item', {data: {name: "Item"}});
+    this.parent = this.props.navigation.getParam('parent', {data: {name: ""}})
+    this.user = FirebaseSvc.getCurrentUser();
 
     this.state = {
       messages:[],
@@ -52,56 +44,33 @@ export default class Chatroom extends Component {
     };
   }
 
-  componentWillMount() {
-    this.setState({
-      messages: [
-        {
-          _id: 1,
-          text: 'Hello developer',
-          createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: 'React Native',
-            avatar: 'https://placeimg.com/140/140/any',
-          },
-        },
-      ],
-    })
+  componentWillMount = async () => {
+    this.unsubscribeChat = await FirebaseSvc
+      .getChatRef(this.item.id)
+      .onSnapshot(this.fetchMessage);
   }
 
-  // componentWillMount() {
-    // this.unsubscribe = this.query.onSnapshot(async (querySnapshot)=>{
-    //   let messages = [];
-    //   querySnapshot.forEach(async (doc)=>{
-    //     var data = doc.data();
-    //     data.user.avatar = 'https://placeimg.com/140/140/any';
-    //     //doc.data().user.push({'avatar': 'gs://tugasakhir-74ab0.appspot.com/any.jpeg',});
-    //     messages.push(data);
-    //   });
-    //   this.setState({ messages });
-    // });
-  // }
+  fetchMessage = (querySnapshot) => {
+    let messages = [];
+    querySnapshot.forEach( (doc) => {
+      messages.push(doc.data().message);
+    });
+    this.setState({
+      messages: messages,
+    });
+  }
 
   sendMessage = (messages=[]) => {
-    return this.chats.add(messages[0]);
+    FirebaseSvc.sendMessage(messages[0], this.item);
   }
-
-	closeDrawer = () => {
-		this._drawer._root.close();
-	}
-
-	openDrawer = () => {
-		this._drawer._root.open();
-	}
 
   onSend(messages = []) {
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
-    }))
+    }));
   }
 
   renderComposer(props) {
-    console.log('props',props);
     return (
       <Composer
          {...props}
@@ -127,6 +96,18 @@ export default class Chatroom extends Component {
     )
   }
 
+  renderSend(props) {
+    return (
+      <Send
+        {...props}
+      >
+        <View style={{marginRight: 10, marginBottom: 10}}>
+          <MaterialIcon name="send" size={29}/>
+        </View>
+      </Send>
+    );
+  }
+
   handleChoosePhoto = () => {
 		const options = {
 			noData: true,
@@ -143,37 +124,46 @@ export default class Chatroom extends Component {
     // console.log("This", this);
     return (
       <Container>
-      <Header style={{backgroundColor: "#F8F8F8", borderBottomWidth: 0}}>
-        <Left>
-          <Button transparent>
-            <Icon
-              style={{marginLeft: 10}}
-              name={"left"}
-              size={25}
-              onPress={()=>{this.props.navigation.goBack()}}
-            />
-          </Button>
-        </Left>
-        <Body stle={{flex: 3}}>
-        </Body>
-        <Right>
-          <Button transparent>
-            <Icon name="folder1" size={20} />
-          </Button>
-          <Button transparent>
-            <Icon name="profile" size={20} />
-          </Button>
-        </Right>
-      </Header>
+        <Header style={{backgroundColor: "#F8F8F8", borderBottomWidth: 0}}>
+          <Left>
+            <Button transparent>
+              <Icon
+                style={{marginLeft: 10}}
+                name={"left"}
+                size={25}
+                onPress={()=>{this.props.navigation.goBack()}}
+              />
+            </Button>
+          </Left>
+          <Body stle={{flex: 3}}>
+            <Text>{this.parent.data.name}</Text>
+          </Body>
+          <Right>
+            <Button transparent>
+              <Icon name="folder1" size={20} />
+            </Button>
+            <Button transparent>
+              <Icon name="profile" size={20} />
+            </Button>
+          </Right>
+        </Header>
+        <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
+          <Text>{this.item.data.name}</Text>
+        </ListItem>
         <GiftedChat
           messages={this.state.messages}
           multiline={true}
-          onSend={messages => this.onSend(messages)}
-          renderActions={this.renderActions}
-          renderComposer={props => this.renderComposer(props)}
-          onPressActionButton = {this.handleChoosePhoto}
+          onSend={messages => this.sendMessage(messages)}
+          renderUsernameOnMessage={true}
+          isLoadingEarlier={true}
+          // renderActions={this.renderActions}
+          renderComposer={this.renderComposer}
+          renderSend={this.renderSend}
+          // onPressActionButton = {this.handleChoosePhoto}
           user={{
-            _id: 1,
+            _id: this.user.uid,
+            avatar: this.user.photoURL,
+            name: this.user.displayName,
           }}
         />
       </Container>

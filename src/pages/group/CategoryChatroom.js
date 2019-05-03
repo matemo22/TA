@@ -176,8 +176,9 @@ export default class CategoryChatroom extends Component {
         if(chatroom.some(a=>a.data.cid === item.id)) {
           for (var i = 0; i < chatroom.length; i++) {
             if(chatroom[i].data.cid==item.id){
+              let tempData = chatroom[i];
               temp.push(
-                <ListItem onPress={()=>{this.props.navigation.navigate("Chatroom", {item: item})}} key={chatroom[i].id}>
+                <ListItem onPress={()=>{this.props.navigation.navigate("Chatroom", {item: tempData, parent: item})}} key={chatroom[i].id}>
                   <Icon name="book"/>
                   <Text style={styles.deactiveListItemTextIcon}>{chatroom[i].data.name}</Text>
                 </ListItem>
@@ -209,10 +210,11 @@ export default class CategoryChatroom extends Component {
       if(chatroom.some(a=>a.data.cid === item.id)) {
         for (var i = 0; i < chatroom.length; i++) {
           if(chatroom[i].data.cid==item.id){
+            let tempData = chatroom[i];
             if(chatroom[i].data.private) {
               if(role.some(r=>chatroom[i].data.roles.includes(r.id))) {
                 temp.push(
-                  <ListItem onPress={()=>{this.props.navigation.navigate("Chatroom", {item: item})}} key={chatroom[i].id}>
+                  <ListItem onPress={()=>{this.props.navigation.navigate("Chatroom", {item: tempData, parent: item})}} key={chatroom[i].id}>
                     <Icon name="book"/>
                     <Text style={styles.deactiveListItemTextIcon}>{chatroom[i].data.name}</Text>
                     <Icon name="lock" color="#777777" style={{marginLeft: 3}}/>
@@ -222,7 +224,7 @@ export default class CategoryChatroom extends Component {
             }
             else {
               temp.push(
-                <ListItem onPress={()=>{this.props.navigation.navigate("Chatroom", {item: item})}} key={chatroom[i].id}>
+                <ListItem onPress={()=>{this.props.navigation.navigate("Chatroom", {item: tempData, parent: item})}} key={chatroom[i].id}>
                   <Icon name="book"/>
                   <Text style={styles.deactiveListItemTextIcon}>{chatroom[i].data.name}</Text>
                 </ListItem>
@@ -274,21 +276,25 @@ export default class CategoryChatroom extends Component {
             <Text>{this.group.data.name}</Text>
           </Body>
           <Right>
-            <Button transparent
-              onPress={()=>this.props.navigation.navigate("Setting", {group: this.group})}>
-              <MaterialIcon
-                name="more-vert"
-                size={25}
-                onPress={()=>{
-                  const BUTTONS = ['Setting', 'Create Category', 'Create Chatroom', 'Cancel'];
-                  ActionSheet.show({
-                    options: BUTTONS,
-                    cancelButtonIndex: BUTTONS.length-1,
-                  }, (buttonIndex)=>{
-                    this._actionSheetClick(buttonIndex)
-                  })
-                }}/>
-            </Button>
+            <Icon name="folder1" size={20} />
+            <Icon
+              name="profile"
+              size={20}
+              style={{marginLeft: 16}}
+              onPress={()=>{this.props.navigation.navigate("Notes", {group: this.group});}}/>
+            <MaterialIcon
+              name="more-vert"
+              size={20}
+              style={{marginBottom: 2, marginLeft: 8}}
+              onPress={()=>{
+              const BUTTONS = ['Setting', 'Create Category', 'Create Chatroom', 'Cancel'];
+              ActionSheet.show({
+                options: BUTTONS,
+                cancelButtonIndex: BUTTONS.length-1,
+              }, (buttonIndex)=>{
+                this._actionSheetClick(buttonIndex)
+              })
+            }}/>
           </Right>
         </Header>
         <Content bounces={false}>

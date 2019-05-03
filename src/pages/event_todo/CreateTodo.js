@@ -23,7 +23,8 @@ import {
   Switch,
   Toast,
   Textarea,
-  Picker
+  Picker,
+  CheckBox
 } from 'native-base';
 import FirebaseSvc from '../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -293,11 +294,24 @@ export default class CreateEvent extends Component {
     }
   }
 
+  checkItem = (item) => {
+    let tmp = this.state.todo;
+    if ( tmp.includes( item ) ) {
+      var i = tmp.indexOf(item);
+      tmp[i].completed = !tmp[i].completed;
+    }
+    this.setState({
+      todo: tmp,
+      refresh: !this.state.refresh,
+    });
+  }
+
   _renderTodo = ({item}) => {
     return (
       <ListItem>
+        <CheckBox checked={item.completed} onPress={()=>{this.checkItem(item)}}/>
         <Left>
-          <Text>{item.title}</Text>
+          <Text style={{marginLeft: 10}}>{item.title}</Text>
         </Left>
         <Right>
           <Icon name="close"

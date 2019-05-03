@@ -75,6 +75,8 @@ class FirebaseSvc {
       email: user.email,
       photoURL: user.photoURL,
       uid: user.uid,
+      groups: [],
+      roles: [],
     })
     .then(function(){
       console.log("Create User DB Success");
@@ -287,6 +289,21 @@ class FirebaseSvc {
     });
   }
 
+  sendMessage = (message, item) => {
+    let crid = item.id;
+    this.firestore.collection("chats").add({
+      message,
+      createdAt: message.createdAt,
+      crid: crid,
+    })
+    .then(() => {
+      console.log("Send Messages");
+    })
+    .catch((error) => {
+      console.error("Error Send Message", error);
+    });
+  }
+
   createTodo = (todo, success_callback) => {
     this.firestore.collection("todos").add({
       title: todo.title,
@@ -337,6 +354,7 @@ class FirebaseSvc {
       }
       else {
         querySnapshot.forEach((doc) => {
+          console.log("DOC", doc);
           let members = doc.data().members;
           let user = this.auth.currentUser;
           let found = members.includes(user.uid);
@@ -447,12 +465,12 @@ class FirebaseSvc {
     });
   }
 
-  sendMessage = (messages, crid) => {
-    this.firestore.collection("chats").add({
-      messages,
-      crid: crid,
-    });
-  }
+  // sendMessage = (messages, crid) => {
+  //   this.firestore.collection("chats").add({
+  //     messages,
+  //     crid: crid,
+  //   });
+  // }
 
   getCurrentUser = () => {
     var user = this.auth.currentUser;
@@ -481,6 +499,12 @@ class FirebaseSvc {
   getChatroomRef = (gid) => {
     var chatroomRef = this.firestore.collection("chatrooms").where('gid', '==', gid);
     return chatroomRef;
+  }
+
+  getChatRef = (crid) => {
+    var chatRef = this.firestore.collection("chats").where('crid', '==', crid);
+    chatRef = chatRef.orderBy("createdAt", "desc");
+    return chatRef;
   }
 
   getEventRef = (gid) => {
@@ -516,6 +540,11 @@ class FirebaseSvc {
   getAllUserRefByGId = (gid) => {
     var userRef = this.firestore.collection("user").where("groups", "array-contains", gid);
     return userRef;
+  }
+
+  getNotesRef = (gid) => {
+    var notesRef = this.firestore.collection("notes").where("gid", "==", gid);
+    return notesRef;
   }
 
   logout = (success_callback, failed_callback) => {

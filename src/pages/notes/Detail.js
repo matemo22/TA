@@ -25,7 +25,7 @@ import {
   Input,
   Textarea
 } from 'native-base';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { DrawerActions } from 'react-navigation';
 import ViewMoreText from 'react-native-view-more-text';
 import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
@@ -35,6 +35,7 @@ import TimeAgo from 'react-native-timeago';
 export default class Detail extends Component {
   constructor(props) {
     super(props);
+    this.item = this.props.navigation.getParam('item', {});
 
     this.state = {
       comments: [{ key: "1", id: 1, name:"Tono", message:"Comment 1", avatar: 'https://cdn-images-1.medium.com/max/1600/1*t_G1kZwKv0p2arQCgYG7IQ.gif', time:new Date() },
@@ -47,9 +48,6 @@ export default class Detail extends Component {
   goToPage = () => {
     this.props.navigation.navigate("Profile");
   }
-
-  renderViewMore(onPress){return(null)}
-  renderViewLess(onPress){return(null)}
 
   _menu=null;
 
@@ -112,7 +110,7 @@ export default class Detail extends Component {
               transparent
               onPress={()=>{this.props.navigation.goBack()}}
             >
-              <Icon name={"chevron-left"} size={30} color="#298CFB"/>
+              <MaterialIcon name={"chevron-left"} size={30} color="#298CFB"/>
               <Text style={{marginLeft: -5}}>Back</Text>
             </Button>
           </Left>
@@ -142,7 +140,7 @@ export default class Detail extends Component {
                   ref={this.setMenuRef}
                   button={
                     <Button transparent onPress={this.showMenu}>
-                      <Icon
+                      <MaterialIcon
                         name={"more-horiz"}
                         size={30}
                         color="#87838B"
@@ -166,18 +164,9 @@ export default class Detail extends Component {
                   <Col>
                     <Button
                       transparent
-                      onPress={()=>{console.log("Like");}}
+                      onPress={()=>{this.props.navigation.navigate('DetailNotes', {item: item})}}
                       style={{justifyContent: 'center', alignItems: 'center'}}>
-                      <Icon name="thumb-up" />
-                      <Text style={{color: '#87838B'}}>Like</Text>
-                    </Button>
-                  </Col>
-                  <Col>
-                    <Button
-                      transparent
-                      onPress={()=>{this._commentRef._textInput.focus();}}
-                      style={{justifyContent: 'center', alignItems: 'center'}}>
-                      <Icon name="comment" />
+                      <MaterialIcon name="comment" />
                       <Text style={{color: '#87838B'}}>Comment</Text>
                     </Button>
                   </Col>
@@ -186,8 +175,6 @@ export default class Detail extends Component {
             </CardItem>
             <CardItem bordered>
               <Left>
-                <Icon name="thumb-up" color="#298CFB"/>
-                <Text note>3</Text>
               </Left>
               <Right>
                 <Text note>2 Comments</Text>
@@ -220,7 +207,7 @@ export default class Detail extends Component {
                 this._commentRef = r;
               }}
             />
-            <Icon name="send" size={30} onPress={()=>{this.addComment()}}/>
+            <MaterialIcon name="send" size={30} onPress={()=>{this.addComment()}}/>
           </Item>
         </Footer>
       </Container>

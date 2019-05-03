@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import { View, AsyncStorage, FlatList } from 'react-native';
+import Dialog, { DialogTitle, DialogFooter, DialogButton, DialogContent } from 'react-native-popup-dialog';
 import {
   Container,
 	Header,
@@ -29,10 +30,13 @@ export default class Members extends Component {
     super(props);
     this.unsubscribeUser = null;
     this.group = this.props.navigation.getParam('group', []);
+    this.user = FirebaseSvc.getCurrentUser().uid;
     this.state = {
       group: this.group,
       refresh: false,
       members: [],
+      dialog: false,
+      item: {data:{displayName: 'None', uid: '0'}},
     };
   }
 
@@ -61,31 +65,23 @@ export default class Members extends Component {
     });
   }
 
-  // fetchUser = (doc) => {
-  //   let data = doc.data();
-  //   let user = {
-  //     doc: doc,
-  //     data: data,
-  //     id: doc.id,
-  //   };
-  //   this.setState({
-  //     user: user,
-  //     refresh: !this.state.refresh,
-  //   });
-  // }
-
   _renderItem = ({item}) => {
     let temp = [];
+
     temp.push(
       <ListItem
       icon key={item.id}
       onPress={()=>{this.props.navigation.navigate("EditMember", {group: this.group, member: item})}}>
         <Left></Left>
         <Body>
-          <Text>{item.data.displayName}{item.data.uid == FirebaseSvc.getCurrentUser().uid ? " (You)" : ""}</Text>
+          <Text>{item.data.displayName}{item.data.uid == this.user ? " (You)" : ""}</Text>
         </Body>
         <Right>
-          <Icon name="delete" onPress={()=>{this.deleteMember(item.data.uid)}}/>
+          {item.data.uid != this.user ?
+            <Icon name="delete" onPress={()=>{this.showDialog(item)}}/>
+            :
+            <View></View>
+          }
         </Right>
       </ListItem>
     )
@@ -93,6 +89,15 @@ export default class Members extends Component {
       temp
     )
   }
+
+  showDialog = (item) => {
+    this.setState({
+      item,
+      dialog: true,
+    });
+  }
+
+  // this.deleteMember(item.data.uid)
 
   deleteMember = async (id) => {
     FirebaseSvc.deleteMember(id, this.state.group, this.deleteSuccess());
@@ -139,7 +144,40 @@ export default class Members extends Component {
             />
           </List>
         </Content>
+        <Dialog
+          visible={this.state.dialog}
+          width={0.8}
+          onTouchOutside={() => {
+            this.setState({ dialog: false });
+          }}
+          onDismiss={() => {
+            this.setState({ dialog: false });
+          }}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                text="CANCEL"
+                onPress={() => {
+                  console.log("Cancel");
+                  this.setState({ dialog: false });
+                }}
+              />
+              <DialogButton
+                text="YES"
+                onPress={() => {
+                  console.log("OK");
+                  this.setState({ dialog: false });
+                }}
+              />
+            </DialogFooter>
+          }
+        >
+          <View style={{padding: 18, justifyContent: 'center', alignItems: 'center'}}>
+            <Text style={{textAlign: 'center'}}>Kick {this.state.item.data.displayName}?</Text>
+          </View>
+        </Dialog>
       </Container>
+
     );
   }
 }
