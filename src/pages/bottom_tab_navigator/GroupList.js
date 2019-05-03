@@ -7,6 +7,8 @@ import {
 	Header,
 	Title,
 	Content,
+	Footer,
+	FooterTab,
 	Button,
 	Body,
 	Text,
@@ -130,27 +132,29 @@ export default class GroupList extends Component {
         }}>
           <View
             style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Button style={{
+            <Button
+							style={{
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexDirection: 'column',
-              }} transparent
+							}}
+							transparent
               onPress={()=>
-              ActionSheet.show({
-                options: BUTTONS,
-                cancelButtonIndex: CANCEL_INDEX,
-              }, (buttonIndex)=>{
-                if(buttonIndex==0) {
-                  this.props.navigation.navigate("CreateGroup");
-                }
-                if(buttonIndex==1) {
-                  this.props.navigation.navigate("JoinGroup");
-                }
-                // this._actionSheetClick(buttonIndex)
-              })
-            }>
+								ActionSheet.show({
+									options: BUTTONS,
+									cancelButtonIndex: CANCEL_INDEX,
+								}, (buttonIndex)=>{
+									if(buttonIndex==0) {
+										this.props.navigation.navigate("CreateGroup");
+									}
+									if(buttonIndex==1) {
+										this.props.navigation.navigate("JoinGroup");
+									}
+									// this._actionSheetClick(buttonIndex)
+								})
+							}>
               <Icon name="plus" size={20}/>
-              <Text style={{textAlign:'center', marginTop: 4}}>Add Group</Text>
+              <Text style={{textAlign:'center', marginTop: 4, color: "#1C75BC"}}>Add Group</Text>
             </Button>
           </View>
         </View>
@@ -175,10 +179,10 @@ export default class GroupList extends Component {
   render() {
     return (
       <Container>
-        <Header style={{backgroundColor: "#F8F8F8", borderBottomWidth: 0}}>
+        <Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC", borderWidth: 0}}>
           <Left></Left>
           <Body stle={{flex: 3}}>
-            <Text>Groups</Text>
+            <Text style={{color: "#FFFFFF"}}>Groups</Text>
           </Body>
           <Right>
           </Right>
@@ -192,6 +196,19 @@ export default class GroupList extends Component {
             keyExtractor={(item, index) => item.id}
           />
         </Content>
+				<Footer style={{backgroundColor: "#1C75BC"}}>
+					<FooterTab style={{backgroundColor: "#1C75BC"}}>
+						<Button onPress={()=>{this.props.navigation.navigate("Groups")}}>
+							<Icon name="team" color="#2B3990" size={20}/>
+						</Button>
+						<Button onPress={()=>{this.props.navigation.navigate("Planner")}}>
+							<Icon name="bells" color="#FFFFFF" size={20}/>
+						</Button>
+						<Button onPress={()=>{this.props.navigation.navigate("Profile")}}>
+							<Icon name="user" color="#FFFFFF" size={20}/>
+						</Button>
+					</FooterTab>
+				</Footer>
       </Container>
     )
   }

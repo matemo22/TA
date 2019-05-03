@@ -31,7 +31,7 @@ import JoinGroup from './src/pages/JoinGroup';
 
 import Dashboard from './src/pages/Dashboard';
 import GroupList from './src/pages/bottom_tab_navigator/GroupList';
-import Profile from './src/pages/Profile';
+import Profile from './src/pages/bottom_tab_navigator/Profile';
 
 //##Group
 import CategoryChatroom from './src/pages/group/CategoryChatroom';
@@ -289,7 +289,7 @@ const EventStack = createStackNavigator({
 
 GroupStack.navigationOptions = ({navigation}) => {
   let tabBarVisible = true;
-  if (navigation.state.index > 0) {
+  if (navigation.state.index >= 0) {
     tabBarVisible = false;
   }
   return {
@@ -332,28 +332,24 @@ const GroupListStack = createStackNavigator({
   }),
 });
 
-GroupListStack.navigationOptions = ({navigation}) => {
-  let tabBarVisible = true;
-  if (navigation.state.index > 0) {
-    tabBarVisible = false;
-  }
-  return {
-    tabBarVisible
-  };
-};
-
 const AppBottomNavigator = createBottomTabNavigator({
   Groups: {
     screen: GroupListStack,
   },
+	Planner: {
+    screen: PlannerStack,
+  },
   Profile: {
     screen: Profile,
   },
-  Planner: {
-    screen: PlannerStack,
-  }
 }, {
-  initialRouteName: 'Groups'
+  initialRouteName: 'Groups',
+	defaultNavigationOptions: ({navigation}) => {
+    return {
+      tabBarVisible: false,
+			gesturesEnabled: false,
+    }
+  },
 });
 
 const AuthTabs = createStackNavigator({
