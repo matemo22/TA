@@ -35,7 +35,7 @@ export default class Loading extends Component {
         <Content contentContainerStyle={{justifyContent: 'center', flex: 1}}>
           <Image
             source={require('../assets/images/logo-black.png')}
-            style={{width: "50%", height: "30%", alignSelf: 'center'}}
+            style={{width: "40%", height: "20%", alignSelf: 'center'}}
           />
         </Content>
       </Container>

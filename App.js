@@ -349,6 +349,9 @@ const AppBottomNavigator = createBottomTabNavigator({
   Profile: {
     screen: Profile,
   },
+  Planner: {
+    screen: PlannerStack,
+  }
 }, {
   initialRouteName: 'Groups'
 });

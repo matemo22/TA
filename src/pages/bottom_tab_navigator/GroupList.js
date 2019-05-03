@@ -108,7 +108,7 @@ export default class GroupList extends Component {
               small
               source={item.data.photoURL ? {uri:item.data.photoURL} : require('../../assets/images/icon.png')} />
             <Text
-              style={{textAlign:'center'}}>
+              style={{textAlign:'center', marginTop: 10}}>
               {item.data.name}
             </Text>
           </TouchableOpacity>

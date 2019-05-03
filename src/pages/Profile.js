@@ -121,6 +121,15 @@ export default class Setting extends Component {
               </Body>
               <Right></Right>
             </ListItem>
+            <ListItem icon onPress={()=>{this.props.navigation.navigate("Planner")}}>
+              <Left>
+                <Icon name="logout"/>
+              </Left>
+              <Body>
+                <Text>Planner</Text>
+              </Body>
+              <Right></Right>
+            </ListItem>
           </List>
         </Content>
       </Container>

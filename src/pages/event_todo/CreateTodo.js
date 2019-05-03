@@ -378,9 +378,8 @@ export default class CreateEvent extends Component {
                     renderItem={this._renderTodo}
                   />
                   :
-                  <ListItem>
-                    <Text note>Empty todo</Text>
-                  </ListItem>
+                  <View>
+                  </View>
                 }
               </View>
             </View>
@@ -402,7 +401,7 @@ export default class CreateEvent extends Component {
             <View style={{margin: 16, borderBottomColor: '#F2F0F3', borderBottomWidth: 1, paddingBottom: 16}}>
               <Text style={{color: '#757575'}}>Select Category</Text>
               <Picker
-                iosIcon={<Icon name="down-square-o" color="#757575"/>}
+                iosIcon={<MaterialIcon name="arrow-drop-down" color="#757575"/>}
                 mode="dropdown"
                 placeholder="Uncategorized"
                 textStyle={{ color: "#757575", fontSize: 12 }}
