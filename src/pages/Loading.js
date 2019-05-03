@@ -5,6 +5,7 @@ import {
   Content,
   Container,
   Text,
+	Header,
 } from 'native-base';
 import FirebaseSvc from '../assets/services/FirebaseSvc';
 import { YellowBox, Image } from 'react-native';
@@ -31,10 +32,12 @@ export default class Loading extends Component {
 
   render() {
     return (
-      <Container>
+      <Container style={{backgroundColor: "#1C75BC"}}>
+				<Header androidStatusBarColor="#1C75BC" style={{display:'none'}}>
+				</Header>
         <Content contentContainerStyle={{justifyContent: 'center', flex: 1}}>
           <Image
-            source={require('../assets/images/logo-black.png')}
+            source={require('../assets/images/logo-white.png')}
             style={{width: "40%", height: "20%", alignSelf: 'center'}}
           />
         </Content>

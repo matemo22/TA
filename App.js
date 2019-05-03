@@ -385,9 +385,6 @@ const RootSwitch = createSwitchNavigator({
     AppBottomNavigator: {
       screen: AppBottomNavigator,
     },
-    // AppDrawerNavigator: {
-    //   screen: AppDrawerNavigator,
-    // },
     AuthTabs: {
       screen: AuthTabs,
     },

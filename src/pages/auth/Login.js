@@ -78,6 +78,8 @@ export default class Login extends Component {
   render() {
     return (
       <Container>
+				<Header androidStatusBarColor="#1C75BC" style={{display:'none'}}>
+				</Header>
         <Content>
           <Text style={{textAlign: 'center', fontSize: 30, marginTop: 50}}>
             Login
@@ -94,7 +96,7 @@ export default class Login extends Component {
           </Form>
           <Button
             onPress={()=>this.onPressLogin()}
-            style={{alignSelf:'center', marginTop:10, width: '98%', justifyContent: 'center'}}
+            style={{backgroundColor: "#1C75BC", alignSelf:'center', marginTop:10, width: '98%', justifyContent: 'center'}}
 					>
             <Text>Login</Text>
           </Button>
@@ -102,7 +104,7 @@ export default class Login extends Component {
 				<Footer style={{backgroundColor: "#FFFFFF"}}>
 					<Text>
 						<Text>Don't have an account? </Text>
-						<Text style={{color: "#2B3990"}} onPress={()=>this.onPressSignUp()}>Sign Up</Text>
+						<Text style={{color: "#1C75BC"}} onPress={()=>this.onPressSignUp()}>Sign Up</Text>
 					</Text>
 				</Footer>
       </Container>

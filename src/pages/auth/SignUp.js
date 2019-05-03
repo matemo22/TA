@@ -81,15 +81,15 @@ export default class SignUp extends Component {
   render() {
     return (
       <Container>
-				<Header style={{backgroundColor: "#F8F8F8"}}>
+				<Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC"}}>
 					<Left>
-						<Icon name='left' size={30} onPress={()=>{this.props.navigation.goBack()}} />
+						<Icon name='left' color="#FFFFFF" size={30} onPress={()=>{this.props.navigation.goBack()}} />
 					</Left>
 					<Body>
-						<Text>New Account</Text>
+						<Text style={{color: "#FFFFFF"}}>New Account</Text>
 					</Body>
 					<Right>
-						<Text onPress={()=>{this.onPressCreate()}}>Create</Text>
+						<Text style={{color: "#FFFFFF"}} onPress={()=>{this.onPressCreate()}}>Create</Text>
 					</Right>
 				</Header>
         <Content>

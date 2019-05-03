@@ -48,7 +48,7 @@ export default class NewUser extends Component {
 
 	updateSuccess = () => {
 		console.log("User Info Updated");
-		this.props.navigation.navigate("AppDrawerNavigator");
+		this.props.navigation.navigate("AppBottomNavigator");
 	}
 
 	onChangeTextName = (name) => {this.setState({name});}
@@ -70,22 +70,22 @@ export default class NewUser extends Component {
 		const img = <Thumbnail large source={{uri: this.state.avatar.uri}} />;
     return (
       <Container>
-				<Header style={{backgroundColor: "#F8F8F8"}}>
+				<Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC"}}>
 					<Left>
 					</Left>
 					<Body>
-						<Text>New Account</Text>
+						<Text style={{color: "#FFFFFF"}}>New Account</Text>
 					</Body>
 					<Right>
 						<Button transparent onPress={()=>{this.onPressSave()}}>
-							<Text>Save</Text>
+							<Text style={{color: "#FFFFFF"}}>Save</Text>
 						</Button>
 					</Right>
 				</Header>
         <Content>
 					<Form style={{justifyContent: 'center', alignItems: 'center', marginTop: 30}}>
             {(this.state.avatar!='') ? img : noImg}
-						<Text onPress={this.handleChoosePhoto} style={{color: "#298CFB", marginTop: 10}}>Select Avatar</Text>
+						<Text onPress={this.handleChoosePhoto} style={{color: "#1C75BC", marginTop: 10}}>Select Avatar</Text>
 						<Item floatingLabel>
               <Label>Your Name</Label>
               <Input onChangeText={(name)=>{this.onChangeTextName(name)}}/>
