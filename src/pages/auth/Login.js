@@ -6,6 +6,7 @@ import {
 	Header,
 	Title,
 	Content,
+	Footer,
 	Button,
 	Body,
 	Text,
@@ -94,16 +95,16 @@ export default class Login extends Component {
           <Button
             onPress={()=>this.onPressLogin()}
             style={{alignSelf:'center', marginTop:10, width: '98%', justifyContent: 'center'}}
-            >
+					>
             <Text>Login</Text>
           </Button>
-          <Button
-            onPress={()=>this.onPressSignUp()}
-            style={{alignSelf:'center', marginTop:5, width: '98%', justifyContent: 'center'}}
-            >
-            <Text>Sign Up</Text>
-          </Button>
         </Content>
+				<Footer style={{backgroundColor: "#FFFFFF"}}>
+					<Text>
+						<Text>Don't have an account? </Text>
+						<Text style={{color: "#2B3990"}} onPress={()=>this.onPressSignUp()}>Sign Up</Text>
+					</Text>
+				</Footer>
       </Container>
     );
   }
