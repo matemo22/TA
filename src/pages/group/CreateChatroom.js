@@ -142,14 +142,14 @@ export default class CreateChatroom extends Component {
   render() {
     return (
       <Container>
-        <Header style={{backgroundColor: "#F8F8F8", borderBottomWidth: 0}}>
+        <Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC", borderBottomWidth: 0}}>
           <Left>
             <Button transparent>
               <Icon
                 style={{marginLeft: 10}}
                 name={"left"}
                 size={25}
-                color="#777777"
+                color="#FFFFFF"
                 onPress={()=>{this.props.navigation.goBack()}}
               />
             </Button>
@@ -160,7 +160,7 @@ export default class CreateChatroom extends Component {
               disabled={!this.state.nameEdited && !this.state.roleEdited && !this.state.statusEdited}
               transparent
               onPress={()=>{this.createChatroom()}}>
-              <Text>Save</Text>
+              <Text style={{color: "#FFFFFF"}}>Save</Text>
             </Button>
           </Right>
         </Header>

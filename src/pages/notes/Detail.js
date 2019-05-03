@@ -104,14 +104,14 @@ export default class Detail extends Component {
   render() {
     return (
       <Container>
-        <Header style={{backgroundColor: "#F8F8F8"}}>
+        <Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC"}}>
           <Left>
             <Button
               transparent
               onPress={()=>{this.props.navigation.goBack()}}
             >
-              <MaterialIcon name={"chevron-left"} size={30} color="#298CFB"/>
-              <Text style={{marginLeft: -5}}>Back</Text>
+              <MaterialIcon name={"chevron-left"} size={30} color="#FFFFFF"/>
+              <Text style={{marginLeft: -5, color: "#FFFFFF"}}>Back</Text>
             </Button>
           </Left>
           <Body stle={{flex: 3}}>

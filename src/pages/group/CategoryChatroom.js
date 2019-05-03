@@ -261,10 +261,11 @@ export default class CategoryChatroom extends Component {
   render() {
     return (
       <Container>
-        <Header style={{backgroundColor: "#F8F8F8", borderBottomWidth: 0}}>
+        <Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC", borderBottomWidth: 0}}>
           <Left>
             <Button transparent>
               <Icon
+                color="#FFFFFF"
                 style={{marginLeft: 10}}
                 name={"left"}
                 size={25}
@@ -273,16 +274,18 @@ export default class CategoryChatroom extends Component {
             </Button>
           </Left>
           <Body stle={{flex: 3}}>
-            <Text>{this.group.data.name}</Text>
+            <Text style={{color: "#FFFFFF"}}>{this.group.data.name}</Text>
           </Body>
           <Right>
             <Icon name="folder1" size={20} />
             <Icon
+              color="#FFFFFF"
               name="profile"
               size={20}
               style={{marginLeft: 16}}
               onPress={()=>{this.props.navigation.navigate("Notes", {group: this.group});}}/>
             <MaterialIcon
+              color="#FFFFFF"
               name="more-vert"
               size={20}
               style={{marginBottom: 2, marginLeft: 8}}

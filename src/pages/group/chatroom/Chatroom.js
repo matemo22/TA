@@ -124,10 +124,11 @@ export default class Chatroom extends Component {
     // console.log("This", this);
     return (
       <Container>
-        <Header style={{backgroundColor: "#F8F8F8", borderBottomWidth: 0}}>
+        <Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC", borderBottomWidth: 0}}>
           <Left>
             <Button transparent>
               <Icon
+                color="#FFFFFF"
                 style={{marginLeft: 10}}
                 name={"left"}
                 size={25}
@@ -136,14 +137,14 @@ export default class Chatroom extends Component {
             </Button>
           </Left>
           <Body stle={{flex: 3}}>
-            <Text>{this.parent.data.name}</Text>
+            <Text style={{color: "#FFFFFF"}}>{this.parent.data.name}</Text>
           </Body>
           <Right>
             <Button transparent>
-              <Icon name="folder1" size={20} />
+              <Icon color="#FFFFFF" name="folder1" size={20} />
             </Button>
             <Button transparent>
-              <Icon name="profile" size={20} />
+              <Icon color="#FFFFFF" name="profile" size={20} />
             </Button>
           </Right>
         </Header>

@@ -197,10 +197,11 @@ export default class Notes extends Component {
   render() {
     return (
       <Container>
-        <Header androidStatusBarColor={"#F8F8F8"} style={{backgroundColor: "#F8F8F8", borderBottomColor: "transparent"}}>
+        <Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC", borderBottomColor: "transparent"}}>
           <Left>
             <Button transparent>
               <Icon
+                color="#FFFFFF"
                 style={{marginLeft: 10}}
                 name={"left"}
                 size={25}
@@ -209,10 +210,10 @@ export default class Notes extends Component {
             </Button>
           </Left>
           <Body stle={{flex: 3}}>
-            <Text>{this.group.data.name}'s Notes</Text>
+            <Text style={{color: "#FFFFFF"}}>{this.group.data.name}'s Notes</Text>
           </Body>
           <Right>
-            <Text>Add</Text>
+            <Text style={{color: "#FFFFFF"}}>Add</Text>
           </Right>
         </Header>
         <Content>

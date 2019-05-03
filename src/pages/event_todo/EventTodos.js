@@ -364,11 +364,11 @@ export default class EventTodos extends Component {
   render() {
     return (
       <Container>
-        <Header style={{backgroundColor: "#F8F8F8", borderBottomWidth: 0}}>
+        <Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC", borderBottomWidth: 0}}>
           <Left>
           </Left>
           <Body stle={{flex: 3}}>
-            <Text>Dashboard</Text>
+            <Text style={{color: "#FFFFFF"}}>Dashboard</Text>
           </Body>
           <Right>
           </Right>

@@ -65,25 +65,25 @@ export default class Create extends Component {
   render() {
     return (
       <Container>
-        <Header style={{backgroundColor: "#F8F8F8"}}>
+        <Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC"}}>
           <Left>
             <Button
               transparent
               onPress={()=>{this.props.navigation.goBack()}}
             >
-              <Icon name={"chevron-left"} size={30} color="#298CFB"/>
-              <Text style={{marginLeft: -5}}>Back</Text>
+              <Icon name={"chevron-left"} size={30} color="#FFFFFF"/>
+              <Text style={{marginLeft: -5, color: "#FFFFFF"}}>Back</Text>
             </Button>
           </Left>
           <Body stle={{flex: 3}}>
-            <Text>Create Notes</Text>
+            <Text style={{color: "#FFFFFF"}}>Create Notes</Text>
           </Body>
           <Right>
             <Button
               transparent
               onPress={()=>{console.log("Create");}}
             >
-              <Text>Post</Text>
+              <Text style={{color: "#FFFFFF"}}>Post</Text>
             </Button>
           </Right>
         </Header>
