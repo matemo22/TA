@@ -7,6 +7,8 @@ import {
 	Header,
 	Title,
 	Content,
+	Footer,
+	FooterTab,
 	Button,
 	Body,
 	Text,
@@ -22,6 +24,7 @@ import {
   Drawer,
   Toast,
   ActionSheet,
+	Fab,
 } from 'native-base';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -161,7 +164,7 @@ export default class CategoryChatroom extends Component {
             }>
             <Left>
               <View style={{flexDirection: 'row'}}>
-                <Text style={{color: '#777777', marginLeft: 16, fontSize: 10, fontFamily: 'System', textTransform: 'uppercase'}}>{item.title}</Text>
+                <Text style={{color: '#777777', marginLeft: 16, fontSize: 10, fontFamily: 'System', }}>{item.title.toUpperCase()}</Text>
                 <Icon color="#777777" name="lock" style={{marginRight: 15}}/>
               </View>
             </Left>
@@ -192,12 +195,11 @@ export default class CategoryChatroom extends Component {
       temp.push(
         <ListItem
           key={item.id}
-          onPress={()=>{console.log("Open Dashboard");}}
           style={chatroom.some(a=>a.data.cid === item.id) ?
             {}:{marginBottom: 10}, styles.category
           }>
           <Left>
-            <Text style={{color: '#777777', marginLeft: 16, fontSize: 10, fontFamily: 'System', textTransform: 'uppercase'}}>{item.title}</Text>
+						<Text style={{fontSize: 10, color: "#777777", fontFamily: 'System', marginLeft: 16,}}>{item.title.toUpperCase()}</Text>
           </Left>
           <Right>
             <MaterialIcon
@@ -242,17 +244,12 @@ export default class CategoryChatroom extends Component {
 
   _actionSheetClick = (buttonIndex) => {
     if(buttonIndex==0) {
-      this.props.navigation.navigate("Setting", {
+			this.props.navigation.navigate("CreateCategory", {
         group: this.group,
       });
     }
     else if(buttonIndex==1) {
-      this.props.navigation.navigate("CreateCategory", {
-        group: this.group,
-      });
-    }
-    else if(buttonIndex==2) {
-      this.props.navigation.navigate("CreateChatroomUn", {
+			this.props.navigation.navigate("CreateChatroomUn", {
         group: this.group,
       });
     }
@@ -277,43 +274,69 @@ export default class CategoryChatroom extends Component {
             <Text style={{color: "#FFFFFF"}}>{this.group.data.name}</Text>
           </Body>
           <Right>
-            <Icon name="folder1" size={20} />
+            <Icon
+							name="folder1"
+							size={20}
+							color="#FFFFFF"
+							onPress={()=>{this.props.navigation.navigate("FileManagement", {group: this.group})}}
+						/>
             <Icon
               color="#FFFFFF"
               name="profile"
               size={20}
               style={{marginLeft: 16}}
               onPress={()=>{this.props.navigation.navigate("Notes", {group: this.group});}}/>
-            <MaterialIcon
+            <Icon
               color="#FFFFFF"
-              name="more-vert"
+              name="setting"
               size={20}
-              style={{marginBottom: 2, marginLeft: 8}}
-              onPress={()=>{
-              const BUTTONS = ['Setting', 'Create Category', 'Create Chatroom', 'Cancel'];
-              ActionSheet.show({
-                options: BUTTONS,
-                cancelButtonIndex: BUTTONS.length-1,
-              }, (buttonIndex)=>{
-                this._actionSheetClick(buttonIndex)
-              })
-            }}/>
+              style={{marginLeft: 16}}
+              onPress={()=>{this.props.navigation.navigate("Setting", {group: this.group})}}/>
           </Right>
         </Header>
         <Content bounces={false}>
-          <FlatList
-            data={this.state.chatroom}
-            renderItem={this._renderItem2}
-            extraData={this.state.refresh}
-            keyExtractor={(item, index) => item.id}
-          />
-          <FlatList
-            data={this.state.category}
-            extraData={this.state.refresh}
-            renderItem={this._renderCategory}
-            keyExtractor={(item, index) => item.id}
-          />
+					<FlatList
+						data={this.state.chatroom}
+						renderItem={this._renderItem2}
+						extraData={this.state.refresh}
+						keyExtractor={(item, index) => item.id}
+					/>
+					<FlatList
+						data={this.state.category}
+						extraData={this.state.refresh}
+						renderItem={this._renderCategory}
+						keyExtractor={(item, index) => item.id}
+					/>
+
         </Content>
+				<View>
+					<Fab
+						position="bottomRight"
+						style={{ backgroundColor:'#1C75BC'}}
+						onPress={() => {
+							const BUTTONS = ['Create Category', 'Create Chatroom', 'Cancel'];
+							ActionSheet.show({
+								options: BUTTONS,
+								cancelButtonIndex: BUTTONS.length-1,
+							}, (buttonIndex)=>{
+								this._actionSheetClick(buttonIndex)
+							})
+						}}
+					>
+						<Icon name="plus"/>
+					</Fab>
+				</View>
+				<Footer style={{backgroundColor: "#1C75BC"}}>
+					<FooterTab style={{backgroundColor: "#1C75BC"}}>
+						<Button onPress={()=>{this.props.navigation.navigate("GroupStack")}}>
+							<Icon name="book" color="#2B3990" size={20}/>
+						</Button>
+						<Button onPress={()=>{this.props.navigation.navigate("Dashboard")}}>
+							<Icon name="dashboard" color="#FFFFFF" size={20}/>
+						</Button>
+					</FooterTab>
+				</Footer>
+
       </Container>
     );
   }

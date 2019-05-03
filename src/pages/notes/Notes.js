@@ -38,13 +38,16 @@ export default class Notes extends Component {
     super(props);
     this.unsubscribeNotes = null;
     this.unsubscribeCategory = null;
+		this.item = this.props.navigation.getParam('item', '');
     this.group = this.props.navigation.getParam('group', '');
     this.state = {
       refresh: false,
-      selectedCategory: "",
+			selectedCategoryId: this.item.id || '',
+      selectedCategory: this.item || '',
       // post: [{key:'1', id: 1, name: 'Andre', time: new Date(), like: 3, comment: 288, text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sed neque lorem. Integer quis turpis est. Pellentesque luctus, elit ut iaculis fringilla, sapien mi mollis dui, et sagittis augue risus nec dolor. Mauris lobortis aliquam tempus. Duis ac mollis nulla. Sed semper et ex nec ullamcorper. Suspendisse viverra, sapien non cursus pulvinar, mi lacus mollis quam, a mollis mi ligula et magna. Ut consectetur tortor non pretium egestas. Curabitur scelerisque dignissim erat ut dignissim. Fusce ut porttitor ligula. Aenean tortor tortor, condimentum a lacus bibendum, auctor hendrerit nisi. Aliquam nec nulla imperdiet, viverra turpis vitae, vehicula orci. Aenean interdum mattis erat non convallis. Maecenas rutrum consequat gravida. Sed fringilla maximus elit, vitae consequat ipsum viverra quis. Nunc euismod lobortis fermentum.'},
       //        {key:'2', id: 2, name: 'Matemo', time: new Date(), like: 3, comment: 0, text: 'Test 1'}]
       post: [],
+			category: [],
     }
   }
 
@@ -58,7 +61,8 @@ export default class Notes extends Component {
   }
 
   componentWillUnmount = () => {
-    this.unsubscribe();
+    this.unsubscribeCategory();
+		this.unsubscribeNotes();
   }
 
   fetchNotes = (querySnapshot) => {
@@ -120,8 +124,8 @@ export default class Notes extends Component {
           <Left>
             { avatar != "" ?
               <Thumbnail source={{uri: avatar}} />
-              :
-              <View></View>
+						:
+						<View></View>
             }
             <Body>
               <Text>{item.data.createdBy.name}</Text>
@@ -171,27 +175,10 @@ export default class Notes extends Component {
     if(!value) {
       value = {empty: true};
     }
-    let availableRole = [];
-    let role = [];
-    let exist = false;
-    if(value.empty) {
-      exist = false;
-    }
-    else {
-      exist = (value.data.roles.length != 0);
-    }
-    for (var i = 0; i < this.state.role.length; i++) {
-      if(exist && value.data.roles.includes(this.state.role[i].id)) {
-        availableRole.push(this.state.role[i]);
-      }
-      role.push(this.state.role[i]);
-    }
     this.setState({
       selectedCategory: value,
       selectedCategoryId: id,
-      availableRole: exist ? availableRole : role,
     });
-
   }
 
   render() {
@@ -217,21 +204,21 @@ export default class Notes extends Component {
           </Right>
         </Header>
         <Content>
-          <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
-            <Picker
-              mode="dropdown"
-              iosHeader="Select Category"
-              iosIcon={<Icon name="down" />}
-              selectedValue={this.state.selectedCategory}
-              onValueChange={this.onPickerCategoryChange.bind(this)}>
-            >
-              <Picker.Item label="Select Category" value=""/>
-              <Picker.Item label="Wallet" value="key0" />
-              <Picker.Item label="ATM Card" value="key1" />
-              <Picker.Item label="Debit Card" value="key2" />
-              <Picker.Item label="Credit Card" value="key3" />
-              <Picker.Item label="Net Banking" value="key4" />
-            </Picker>
+          <ListItem noIndent style={{backgroundColor: "#1C75BC"}}>
+						<Picker
+							iosHeader="Select Category"
+							iosIcon={<Icon name="down" />}
+							mode="dropdown"
+							placeholder="All Category"
+							textStyle={{ fontSize: 12, color: "#FFFFFF" }}
+							selectedValue={this.state.selectedCategoryId}
+							onValueChange={this.onPickerCategoryChange.bind(this)}>
+							<Picker.Item label="All Category" value="0" />
+							<Picker.Item label="Uncategorized" value="1" />
+							{this.state.category.map(item => (
+								<Picker.Item key={item.id} label={item.data.name} value={item.id} />
+							))}
+						</Picker>
           </ListItem>
           <FlatList
             data={this.state.post}

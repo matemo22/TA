@@ -242,6 +242,9 @@ const GroupStack = createStackNavigator({
   Chatroom: {
     screen: Chatroom,
   },
+	FileManagement: {
+		screen: FileManagement,
+	},
   Notes: {
     screen: NotesStack,
   },
@@ -287,22 +290,18 @@ const EventStack = createStackNavigator({
   }),
 });
 
-GroupStack.navigationOptions = ({navigation}) => {
-  let tabBarVisible = true;
-  if (navigation.state.index >= 0) {
-    tabBarVisible = false;
-  }
-  return {
-    tabBarVisible
-  };
-};
-
 const GroupBottomNavigator = createBottomTabNavigator({
   Chatroom: {
     screen: GroupStack,
   },
   Dashboard: {
     screen: EventStack,
+  },
+}, {
+	defaultNavigationOptions: ({navigation}) => {
+    return {
+      tabBarVisible: false,
+    }
   },
 });
 
