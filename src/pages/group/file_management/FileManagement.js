@@ -23,16 +23,17 @@ import {
   List,
   ListItem,
   Thumbnail,
-  Drawer,
   Toast,
   ActionSheet,
 	Fab,
 } from 'native-base';
+import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import AllFiles from './AllFiles';
-import Images from './Images';
+import Media from './Media';
 import Files from './Files';
+import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
 
 export default class FileManagement extends Component {
 	constructor(props) {
@@ -46,25 +47,26 @@ export default class FileManagement extends Component {
 		};
 	}
 
-	showActionSheet = (item = {empty: true}) => {
-    var BUTTONS = ["Photo", "File", "Cancel"];
-    var CANCEL_INDEX = BUTTONS.length-1;
-    ActionSheet.show(
-    {
-      options: BUTTONS,
-      cancelButtonIndex: CANCEL_INDEX,
-    },
-    (buttonIndex) => {
-      if(buttonIndex == 0) {
-        //image
-				console.log("Image");
-      }
-      else if(buttonIndex == 1) {
-       //files
-			 console.log("Files");
-      }
+	selectFile = () => {
+		DocumentPicker.show({
+			filetype: [DocumentPickerUtil.allFiles()],
+		},(error,res) => {
+			if(res) {
+				FirebaseSvc.uploadFile(res, this.group, this.uploadSuccess());
+			}
+			if(error) {
+				console.log("Error", error);
+			}
+		});
+	}
+
+	uploadSuccess = () => {
+		Toast.show({
+      text: "Upload Success!",
+      buttonText: "Okay!",
+      duration: 2000,
     });
-  }
+	}
 
   render() {
     return (
@@ -87,20 +89,20 @@ export default class FileManagement extends Component {
           <Right>
 						<Text
 							style={{color: "#FFFFFF"}}
-							onPress={()=>{this.showActionSheet()}}>
+							onPress={()=>{this.selectFile()}}>
 							Add
 						</Text>
 					</Right>
         </Header>
-				<Tabs>
+				<Tabs locked>
           <Tab heading="All Files" tabStyle={{backgroundColor: "#1C75BC"}} activeTabStyle={{backgroundColor: "#1C75BC"}}>
-            <AllFiles />
+            <AllFiles group={this.group} />
           </Tab>
-          <Tab heading="Images" tabStyle={{backgroundColor: "#1C75BC"}} activeTabStyle={{backgroundColor: "#1C75BC"}}>
-            <Images />
+          <Tab heading="Media" tabStyle={{backgroundColor: "#1C75BC"}} activeTabStyle={{backgroundColor: "#1C75BC"}}>
+            <Media group={this.group} />
           </Tab>
           <Tab heading="Files" tabStyle={{backgroundColor: "#1C75BC"}} activeTabStyle={{backgroundColor: "#1C75BC"}}>
-            <Files />
+            <Files group={this.group} />
           </Tab>
         </Tabs>
       </Container>

@@ -28,13 +28,16 @@ import {
   ActionSheet,
 	Fab,
 } from 'native-base';
+import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default class FileManagement extends Component {
+export default class Files extends Component {
 	constructor(props) {
 	  super(props);
 		this.unsubscribeFile = null;
+		this.group = this.props.group;
 
 	  this.state = {
 			files: [],
@@ -42,11 +45,91 @@ export default class FileManagement extends Component {
 		};
 	}
 
+	componentDidMount = async () => {
+		this.unsubscribeFile = await FirebaseSvc
+      .getStorageRef(this.group.id)
+      .onSnapshot(this.fetchFile);
+	}
+
+	componentWillUnmount = () => {
+		this.unsubscribeFile();
+	}
+
+	fetchFile = (querySnapshot) => {
+    let files = [];
+    querySnapshot.forEach( (doc) => {
+			let type = doc.data().fileType.split('/');
+			if(type[0]=="application") {
+				files.push({
+	        doc: doc,
+	        data: doc.data(),
+	        id: doc.id,
+	      });
+			}
+    });
+    this.setState({
+      files: files,
+      refresh: !this.state.refresh,
+    });
+  }
+
+	_renderFiles = ({item}) => {
+    let temp = [];
+		let img = [];
+		let type = item.data.fileType.split('/');
+		if(type[0]=="application") {
+			if(type[1]=="msword" || type[1]=="vnd.openxmlformats-officedocument.wordprocessingml.document") {
+				img.push(
+					<MaterialCommunityIcon size={20} name="file-word-box" key={item.id}/>
+				)
+			}
+			else if(type[1]=="vnd.ms-excel" || type[1]=="vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+				img.push(
+					<MaterialCommunityIcon size={20} name="file-excel-box" key={item.id}/>
+				)
+			}
+			else if(type[1]=="vnd.ms-powerpoint" || type[1]=="vnd.openxmlformats-officedocument.presentationml.presentation") {
+				img.push(
+					<MaterialCommunityIcon size={20} name="file-powerpoint-box" key={item.id}/>
+				)
+			}
+			else if(type[1]=="pdf") {
+				img.push(
+					<MaterialCommunityIcon size={20} name="file-pdf-box" key={item.id}/>
+				)
+			}
+			else {
+				img.push(
+					<MaterialCommunityIcon size={20} name="file" key={item.id}/>
+				)
+			}
+		}
+		else {
+			img.push(
+				<MaterialCommunityIcon size={20} name="file" key={item.id}/>
+			)
+		}
+    temp.push(
+      <ListItem key={item.id}>
+				{img}
+        <Text style={{marginLeft: 5}}>{item.data.fileName}</Text>
+      </ListItem>
+    )
+    return (
+      temp
+    )
+  }
+
   render() {
     return (
       <Container>
         <Content bounces={false}>
-					<Text>Files</Text>
+					<FlatList
+						data={this.state.files}
+						extraData={this.state.refresh}
+						renderItem={this._renderFiles}
+						keyExtractor={(item, index) => item.id}
+					/>
         </Content>
       </Container>
     );

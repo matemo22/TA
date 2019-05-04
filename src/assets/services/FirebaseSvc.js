@@ -1,11 +1,5 @@
 import firebase from 'react-native-firebase';
 import { AsyncStorage, Platform } from 'react-native';
-// import RNFetchBlob from 'react-native-fetch-blob';
-
-// const Blob = RNFetchBlob.polyfill.Blob;
-// const fs = RNFetchBlob.fs;
-// window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
-// window.Blob = Blob;
 
 class FirebaseSvc {
   constructor() {
@@ -13,33 +7,6 @@ class FirebaseSvc {
     this.firestore = firebase.firestore();
     this.storage = firebase.storage();
   }
-
-  // initData = () =>{
-  //   this.firestore.collection("user").doc("3IXi6oDQ28VKYJsdmMQXC2uIokW2")
-  //   .set({
-  //     displayName: "Mmau22",
-  //     email: "mmau22@gmail.com",
-  //     photoURL: "https://firebasestorage.googleapis.com/v0/b/tugasakhir-74ab0.appspot.com/o/avatar%2F3IXi6oDQ28VKYJsdmMQXC2uIokW2?alt=media&token=620ffdf4-3dd6-4b38-863e-7cd3e474d809",
-  //     uid: "3IXi6oDQ28VKYJsdmMQXC2uIokW2",
-  //   });
-  //
-  //   this.firestore.collection("user").doc("Hk6Ziy2NLqc5BuYWIRapx8d7eAO2")
-  //   .set({
-  //     displayName: "Test",
-  //     email: "test@gmail.com",
-  //     photoURL: null,
-  //     uid: "Hk6Ziy2NLqc5BuYWIRapx8d7eAO2",
-  //   });
-  //
-  //   this.firestore.collection("user").doc("RHzc1C13HwcpIjFaJgzgTYToP8u1")
-  //   .set({
-  //     displayName: "Matemo",
-  //     email: "matemo2204@gmail.com",
-  //     photoURL: "https://firebasestorage.googleapis.com/v0/b/tugasakhir-74ab0.appspot.com/o/avatar%2FRHzc1C13HwcpIjFaJgzgTYToP8u1?alt=media&token=80b6e7b2-de55-4d77-9cc5-2c0dd0471f3b",
-  //     uid: "RHzc1C13HwcpIjFaJgzgTYToP8u1",
-  //     roles: ["aAsfDOywWWgEPbocj6yP"],
-  //   });
-  // }
 
   generateCode = (length) => {
     var text = "";
@@ -86,52 +53,6 @@ class FirebaseSvc {
     });
   }
 
-  // uploadGroupAvatar = async (response, gid, mime = 'application/octet-stream') =>{
-  //   return (dispatch) => {
-  //     return new Promise((resolve, reject) => {
-  //       let uri = response.uri;
-  //       const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
-  //       let uploadBlob = null;
-  //
-  //       //Create a reference in firebase storage for the file
-  //       const imageRef = this.storage.ref(gid).child('avatar.png');
-  //       fs.readFile(uploadUri, 'base64')
-  //       .then((data)=>{
-  //         return Blob.build(data, {type: `${mime};BASE64`});
-  //       })
-  //       //place the blub into storage reference
-  //       .then((blob)=>{
-  //         uploadBlob = blob;
-  //         return imageRef.put(blob, {contentType: mime });
-  //       })
-  //       //from here you can get the download url of the image
-  //       //to store a reference to it in your db
-  //       .then(()=>{
-  //         uploadBlob.close();
-  //         return imageRef.getDownloadURL();
-  //       })
-  //       .then((url)=>{
-  //         resolve(url);
-  //         //this storeReference function is an optional helper
-  //         //method you can create to store a reference to the download url
-  //         //of the image in your db
-  //         storeGroupAvatarRef(url, gid);
-  //       })
-  //       .catch((error)=>{
-  //         reject(error);
-  //       });
-  //     });
-  //   }
-  // }
-  //
-  // storeGroupAvatarRef = (downloadUrl, gid) => {
-  //   const createdAt = new Date();
-  //   this.firestore.collection("avatar").doc(gid).set({
-  //     photoURL: downloadURL,
-  //     createdAt: createdAt,
-  //   });
-  // }
-
   uploadAvatar = async (response) => {
     const metadata = {
       contentType: response.type,
@@ -152,6 +73,32 @@ class FirebaseSvc {
       console.log("Error Upload File", error);
     });
   }
+
+	uploadFile = async (response, group, success_callback) => {
+		const metadata = {
+      contentType: response.type,
+    }
+    this.storage.ref().child('storage/'+group.id+"/"+response.fileName)
+    .putFile(response.uri, metadata)
+    .then(async uploadedFile => {
+			console.log("Storage - Success Upload File", uploadedFile);
+      var ref = await this.firestore.collection('storage');
+			ref.add({
+				gid: group.id,
+				fileUrl: uploadedFile.downloadURL,
+				createdAt: new Date(),
+				fileName: response.fileName,
+				fileType: response.type,
+				fileSize: response.fileSize,
+			})
+			.then(success_callback, function(error) {
+				console.error("Firestore - Error Upload File", error);
+			});
+    })
+    .catch(error => {
+      console.log("Error Upload File", error);
+    });
+	}
 
   createProfile = async (user, success_callback) => {
     var currUser = this.auth.currentUser;
@@ -545,6 +492,11 @@ class FirebaseSvc {
   getNotesRef = (gid) => {
     var notesRef = this.firestore.collection("notes").where("gid", "==", gid);
     return notesRef;
+  }
+
+	getStorageRef = (gid) => {
+    var storageRef = this.firestore.collection("storage").where("gid", "==", gid);
+    return storageRef;
   }
 
   logout = (success_callback, failed_callback) => {

@@ -23,7 +23,6 @@ import {
   List,
   ListItem,
   Thumbnail,
-	SwipeRow,
   Drawer,
   Toast,
   ActionSheet,
@@ -34,7 +33,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default class AllFiles extends Component {
+export default class Media extends Component {
 	constructor(props) {
 	  super(props);
 		this.unsubscribeFile = null;
@@ -59,11 +58,14 @@ export default class AllFiles extends Component {
 	fetchFile = (querySnapshot) => {
     let files = [];
     querySnapshot.forEach( (doc) => {
-      files.push({
-        doc: doc,
-        data: doc.data(),
-        id: doc.id,
-      });
+			let type = doc.data().fileType.split('/');
+			if(type[0]=="image" || type[0]=="video" || type[0]=="audio") {
+				files.push({
+	        doc: doc,
+	        data: doc.data(),
+	        id: doc.id,
+	      });
+			}
     });
     this.setState({
       files: files,
@@ -90,57 +92,16 @@ export default class AllFiles extends Component {
 				<MaterialCommunityIcon size={20} name="file-music" key={item.id}/>
 			)
 		}
-		else if(type[0]=="application") {
-			if(type[1]=="msword" || type[1]=="vnd.openxmlformats-officedocument.wordprocessingml.document") {
-				img.push(
-					<MaterialCommunityIcon size={20} name="file-word-box" key={item.id}/>
-				)
-			}
-			else if(type[1]=="vnd.ms-excel" || type[1]=="vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-				img.push(
-					<MaterialCommunityIcon size={20} name="file-excel-box" key={item.id}/>
-				)
-			}
-			else if(type[1]=="vnd.ms-powerpoint" || type[1]=="vnd.openxmlformats-officedocument.presentationml.presentation") {
-				img.push(
-					<MaterialCommunityIcon size={20} name="file-powerpoint-box" key={item.id}/>
-				)
-			}
-			else if(type[1]=="pdf") {
-				img.push(
-					<MaterialCommunityIcon size={20} name="file-pdf-box" key={item.id}/>
-				)
-			}
-			else {
-				img.push(
-					<MaterialCommunityIcon size={20} name="file" key={item.id}/>
-				)
-			}
-		}
 		else {
 			img.push(
 				<MaterialCommunityIcon size={20} name="file" key={item.id}/>
 			)
 		}
     temp.push(
-			<SwipeRow
-				disableLeftSwipe={true}
-				rightOpenValue={-75}
-				key={item.id}
-				body={
-					<View style={{flexDirection: 'row', borderWidth: 0}}>
-						<View style={{marginLeft: 15}}>
-							{img}
-						</View>
-						<Text style={{marginLeft: 5}}>{item.data.fileName}</Text>
-					</View>
-				}
-				right={
-					<Button danger onPress={() => alert('Delete item')}>
-						<Icon name="delete" size={20} color="#FFFFFF" />
-					</Button>
-				}
-			/>
+      <ListItem key={item.id}>
+				{img}
+        <Text style={{marginLeft: 5}}>{item.data.fileName}</Text>
+      </ListItem>
     )
     return (
       temp

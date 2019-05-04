@@ -60,6 +60,7 @@ export default class NewUser extends Component {
 		ImagePicker.launchImageLibrary(options, response => {
 			if(response.uri) {
 				// let uploadUrl = FirebaseSvc.uploadAvatar(response);
+				console.log("Response", response);
 				this.setState({ avatar: response });
 			}
 		});

@@ -3,6 +3,7 @@ package com.ta;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
 import com.imagepicker.ImagePickerPackage;
 import com.wix.autogrowtextinput.AutoGrowTextInputPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -46,7 +47,8 @@ public class MainApplication extends Application implements ReactApplication {
             new RNFirebaseStoragePackage(),
             new RNFirebaseFunctionsPackage(),
             new RNFirebaseMessagingPackage(),
-            new RNFirebaseNotificationsPackage()
+            new RNFirebaseNotificationsPackage(),
+						new ReactNativeDocumentPicker()
       );
     }
 
