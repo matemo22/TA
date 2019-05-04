@@ -7,6 +7,8 @@ import {
 	Header,
 	Title,
 	Content,
+  Footer,
+  FooterTab,
 	Button,
 	Body,
 	Text,
@@ -30,6 +32,7 @@ import FirebaseSvc from '../../assets/services/FirebaseSvc';
 import { Col, Row, Grid } from "react-native-easy-grid";
 import Accordion from 'react-native-collapsible/Accordion';
 import NestedListView, {NestedRow} from 'react-native-nested-listview'
+import { NavigationActions } from 'react-navigation';
 
 export default class EventTodos extends Component {
   constructor(props) {
@@ -389,6 +392,16 @@ export default class EventTodos extends Component {
             renderNode={this.renderNode}
           />
         </Content>
+        <Footer style={{backgroundColor: "#1C75BC"}}>
+					<FooterTab style={{backgroundColor: "#1C75BC"}}>
+						<Button onPress={()=>{this.props.navigation.dispatch(NavigationActions.back())}}>
+							<Icon name="book" color="#FFFFFF" size={20}/>
+						</Button>
+						<Button onPress={()=>{this.props.navigation.navigate("Dashboard")}}>
+							<Icon name="dashboard" color="#2B3990" size={20}/>
+						</Button>
+					</FooterTab>
+				</Footer>
       </Container>
     );
   }

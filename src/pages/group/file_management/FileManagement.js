@@ -95,13 +95,13 @@ export default class FileManagement extends Component {
 					</Right>
         </Header>
 				<Tabs locked>
-          <Tab heading="All Files" tabStyle={{backgroundColor: "#1C75BC"}} activeTabStyle={{backgroundColor: "#1C75BC"}}>
+          <Tab heading="All Files" tabStyle={{backgroundColor: "#1C75BC"}} textStyle={{color: "#9FBBF7"}} activeTabStyle={{backgroundColor: "#1C75BC"}} activeTextStyle={{color: "#FFFFFF"}}>
             <AllFiles group={this.group} />
           </Tab>
-          <Tab heading="Media" tabStyle={{backgroundColor: "#1C75BC"}} activeTabStyle={{backgroundColor: "#1C75BC"}}>
+          <Tab heading="Media" tabStyle={{backgroundColor: "#1C75BC"}} textStyle={{color: "#9FBBF7"}} activeTabStyle={{backgroundColor: "#1C75BC"}} activeTextStyle={{color: "#FFFFFF"}}>
             <Media group={this.group} />
           </Tab>
-          <Tab heading="Files" tabStyle={{backgroundColor: "#1C75BC"}} activeTabStyle={{backgroundColor: "#1C75BC"}}>
+          <Tab heading="Files" tabStyle={{backgroundColor: "#1C75BC"}} textStyle={{color: "#9FBBF7"}} activeTabStyle={{backgroundColor: "#1C75BC"}} activeTextStyle={{color: "#FFFFFF"}}>
             <Files group={this.group} />
           </Tab>
         </Tabs>
