@@ -70,7 +70,7 @@ export default class NewUser extends Component {
 		const img = <Thumbnail large source={{uri: this.state.avatar.uri}} />;
     return (
       <Container>
-				<Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC"}}>
+				<Header noLeft androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC"}}>
 					<Left>
 					</Left>
 					<Body>

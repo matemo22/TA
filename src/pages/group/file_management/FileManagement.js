@@ -9,6 +9,8 @@ import {
 	Content,
 	Footer,
 	FooterTab,
+	Tab,
+	Tabs,
 	Button,
 	Body,
 	Text,
@@ -28,6 +30,9 @@ import {
 } from 'native-base';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import AllFiles from './AllFiles';
+import Images from './Images';
+import Files from './Files';
 
 export default class FileManagement extends Component {
 	constructor(props) {
@@ -41,10 +46,30 @@ export default class FileManagement extends Component {
 		};
 	}
 
+	showActionSheet = (item = {empty: true}) => {
+    var BUTTONS = ["Photo", "File", "Cancel"];
+    var CANCEL_INDEX = BUTTONS.length-1;
+    ActionSheet.show(
+    {
+      options: BUTTONS,
+      cancelButtonIndex: CANCEL_INDEX,
+    },
+    (buttonIndex) => {
+      if(buttonIndex == 0) {
+        //image
+				console.log("Image");
+      }
+      else if(buttonIndex == 1) {
+       //files
+			 console.log("Files");
+      }
+    });
+  }
+
   render() {
     return (
       <Container>
-				<Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC", borderBottomWidth: 0}}>
+				<Header hasTabs androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC", borderBottomWidth: 0}}>
           <Left>
             <Button transparent>
               <Icon
@@ -60,12 +85,24 @@ export default class FileManagement extends Component {
             <Text style={{color: "#FFFFFF"}}>{this.group.data.name}'s Files</Text>
           </Body>
           <Right>
-
+						<Text
+							style={{color: "#FFFFFF"}}
+							onPress={()=>{this.showActionSheet()}}>
+							Add
+						</Text>
 					</Right>
         </Header>
-        <Content bounces={false}>
-
-        </Content>
+				<Tabs>
+          <Tab heading="All Files" tabStyle={{backgroundColor: "#1C75BC"}} activeTabStyle={{backgroundColor: "#1C75BC"}}>
+            <AllFiles />
+          </Tab>
+          <Tab heading="Images" tabStyle={{backgroundColor: "#1C75BC"}} activeTabStyle={{backgroundColor: "#1C75BC"}}>
+            <Images />
+          </Tab>
+          <Tab heading="Files" tabStyle={{backgroundColor: "#1C75BC"}} activeTabStyle={{backgroundColor: "#1C75BC"}}>
+            <Files />
+          </Tab>
+        </Tabs>
       </Container>
     );
   }
