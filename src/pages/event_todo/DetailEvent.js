@@ -69,7 +69,9 @@ export default class DetailEvent extends Component {
 
   componentDidMount = async () => {
     this._convert(this.state.date);
-		this._convert2(this.state.date2);
+		if(this.state.date2) {
+			this._convert(this.state.date2);
+		}
     this.unsubscribeRole = await FirebaseSvc
       .getRoleRef(this.group.id)
       .onSnapshot(this.fetchRole);
@@ -112,13 +114,13 @@ export default class DetailEvent extends Component {
   }
 
   reminderChange = (value) => {
-    var selectedTime = this.state.selectedTime;
-    if(!value) {
-      selectedTime = '';
+		let date = null;;
+    if(value) {
+      date = new Date();
+			this._convert2(date);
     }
 		this.setState({
 			reminder: value,
-      selectedTime: selectedTime,
 		});
 	}
 

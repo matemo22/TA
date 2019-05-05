@@ -50,7 +50,7 @@ export default class CreateEvent extends Component {
       isDateTimePickerVisible2: false,
 			dateText2: '',
       hourText2: '',
-      date2: new Date(),
+      date2: null,
       todo: [{title: "", completed: false,}],
 			selectedRoles: [],
       selectedTime: '',
@@ -68,7 +68,6 @@ export default class CreateEvent extends Component {
   }
 
   componentDidMount = async () => {
-		this._convert2(this.state.date2);
     this.unsubscribeRole = await FirebaseSvc
       .getRoleRef(this.group.id)
       .onSnapshot(this.fetchRole);
@@ -123,13 +122,13 @@ export default class CreateEvent extends Component {
 	}
 
 	reminderChange = (value) => {
-    var selectedTime = this.state.selectedTime;
-    if(!value) {
-      selectedTime = '';
+		let date = null;;
+    if(value) {
+      date = new Date();
+			this._convert2(date);
     }
 		this.setState({
 			reminder: value,
-      selectedTime: selectedTime,
 		});
 	}
 

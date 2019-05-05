@@ -236,6 +236,23 @@ class FirebaseSvc {
     });
   }
 
+	createPost = (post, success_callback) => {
+    this.firestore.collection("notes").add({
+			text: post.text,
+			comment: post.comment,
+			createdAt: post.createdAt,
+			createdBy: post.createdBy,
+			gid: post.gid,
+			cid: post.cid,
+			roles: post.roles,
+			reminder: post.reminder,
+			time_reminder: post.time_reminder,
+    })
+    .then(success_callback, function(error) {
+      console.error("Failed to create Post", error);
+    });
+  }
+
   sendMessage = (message, item) => {
     let crid = item.id;
     this.firestore.collection("chats").add({

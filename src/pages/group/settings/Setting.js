@@ -80,14 +80,14 @@ export default class Setting extends Component {
           </Right>
         </Header>
         <Content bounces={false}>
-          <View style={{backgroundColor: "#F8F8F8", justifyContent: 'center', alignItems: 'center'}}>
+          <View style={{backgroundColor: "#1C75BC", justifyContent: 'center', alignItems: 'center'}}>
             <Thumbnail large source={this.state.uri!='' ? {uri: this.state.uri} : require('../../../assets/images/icon.png')} />
-            <Text style={{marginTop: 20, fontSize: 20}}>{this.state.doc ? this.state.doc._data.name : "Group Name"}</Text>
+            <Text style={{marginTop: 20, fontSize: 20, color: "#FFFFFF"}}>{this.state.doc ? this.state.doc._data.name : "Group Name"}</Text>
           </View>
 
           <List>
-            <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
-              <Text>Setting</Text>
+            <ListItem noIndent style={{backgroundColor: "#1C75BC"}}>
+              <Text style={{color: "#FFFFFF"}}>Setting</Text>
             </ListItem>
             <ListItem icon onPress={()=>{this.props.navigation.navigate("EditGroup", {group: this.state.group})}}>
               <Left>

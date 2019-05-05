@@ -33,7 +33,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import {AutoGrowingTextInput} from 'react-native-autogrow-textinput';
 import { Col, Row, Grid } from "react-native-easy-grid";
 
-export default class CreateEvent extends Component {
+export default class DetailTodo extends Component {
   constructor(props){
     super(props);
     this.unsubscribeRole = null;
@@ -63,7 +63,9 @@ export default class CreateEvent extends Component {
   }
 
   componentDidMount = async () => {
-		this._convert2(this.state.date2);
+		if(this.state.date2) {
+			this._convert2(this.state.date2);
+		}
 		var temp = this.state.todo;
 		temp.push({title: "", completed: false,});
 		this.setState({todo: temp});
@@ -120,13 +122,13 @@ export default class CreateEvent extends Component {
 	}
 
 	reminderChange = (value) => {
-    var selectedTime = this.state.selectedTime;
-    if(!value) {
-      selectedTime = '';
+		let date = null;;
+    if(value) {
+      date = new Date();
+			this._convert2(date);
     }
 		this.setState({
 			reminder: value,
-      selectedTime: selectedTime,
 		});
 	}
 

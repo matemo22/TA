@@ -47,6 +47,7 @@ export default class Notes extends Component {
       // post: [{key:'1', id: 1, name: 'Andre', time: new Date(), like: 3, comment: 288, text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sed neque lorem. Integer quis turpis est. Pellentesque luctus, elit ut iaculis fringilla, sapien mi mollis dui, et sagittis augue risus nec dolor. Mauris lobortis aliquam tempus. Duis ac mollis nulla. Sed semper et ex nec ullamcorper. Suspendisse viverra, sapien non cursus pulvinar, mi lacus mollis quam, a mollis mi ligula et magna. Ut consectetur tortor non pretium egestas. Curabitur scelerisque dignissim erat ut dignissim. Fusce ut porttitor ligula. Aenean tortor tortor, condimentum a lacus bibendum, auctor hendrerit nisi. Aliquam nec nulla imperdiet, viverra turpis vitae, vehicula orci. Aenean interdum mattis erat non convallis. Maecenas rutrum consequat gravida. Sed fringilla maximus elit, vitae consequat ipsum viverra quis. Nunc euismod lobortis fermentum.'},
       //        {key:'2', id: 2, name: 'Matemo', time: new Date(), like: 3, comment: 0, text: 'Test 1'}]
       post: [],
+			allPost: [],
 			category: [],
     }
   }
@@ -76,6 +77,7 @@ export default class Notes extends Component {
     });
     this.setState({
       post: post,
+			allPost: post,
       refresh: !this.state.refresh,
     });
   }
@@ -172,12 +174,32 @@ export default class Notes extends Component {
 
   onPickerCategoryChange = (id) => {
     let value = this.state.category.find(item => item.id === id);
+		let allPost = this.state.allPost;
+		let post = [];
     if(!value) {
+			if(id==0) {
+				post=allPost;
+			}
+			else {
+				for (var i = 0; i < allPost.length; i++) {
+					if(allPost[i].data.cid == "") {
+						post.push(allPost[i]);
+					}
+				}
+			}
       value = {empty: true};
     }
+		else {
+			for (var i = 0; i < allPost.length; i++) {
+				if(allPost[i].data.cid == id) {
+					post.push(allPost[i]);
+				}
+			}
+		}
     this.setState({
       selectedCategory: value,
       selectedCategoryId: id,
+			post: post,
     });
   }
 
@@ -200,7 +222,7 @@ export default class Notes extends Component {
             <Text style={{color: "#FFFFFF"}}>{this.group.data.name}'s Notes</Text>
           </Body>
           <Right>
-            <Text style={{color: "#FFFFFF"}}>Add</Text>
+            <Text style={{color: "#FFFFFF"}} onPress={()=>{this.props.navigation.navigate("CreateNotes", {group: this.group, category: this.state.category})}}>Add</Text>
           </Right>
         </Header>
         <Content>

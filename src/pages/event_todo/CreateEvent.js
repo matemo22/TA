@@ -53,7 +53,7 @@ export default class CreateEvent extends Component {
       date: new Date(),
 			dateText2: '',
       hourText2: '',
-      date2: new Date(),
+      date2: null,
 			selectedRoles: [],
       selectedTime: '',
       selectedCategoryId: this.item.id || '',
@@ -71,7 +71,6 @@ export default class CreateEvent extends Component {
 
   componentDidMount = async () => {
     this._convert(this.state.date);
-		this._convert2(this.state.date2);
     this.unsubscribeRole = await FirebaseSvc
       .getRoleRef(this.group.id)
       .onSnapshot(this.fetchRole);
@@ -114,13 +113,13 @@ export default class CreateEvent extends Component {
   }
 
   reminderChange = (value) => {
-    var selectedTime = this.state.selectedTime;
-    if(!value) {
-      selectedTime = '';
+		let date = null;;
+    if(value) {
+      date = new Date();
+			this._convert2(date);
     }
 		this.setState({
 			reminder: value,
-      selectedTime: selectedTime,
 		});
 	}
 
@@ -135,12 +134,6 @@ export default class CreateEvent extends Component {
       selectedRoles: selectedRoles,
 		});
 	}
-
-  onPickerReminderChange = (value: string) => {
-    this.setState({
-      selectedTime: value,
-    });
-  }
 
   onPickerCategoryChange = (id) => {
     let value = this.state.category.find(item => item.id === id);

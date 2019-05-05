@@ -31,37 +31,35 @@ import ViewMoreText from 'react-native-view-more-text';
 import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
 import {AutoGrowingTextInput} from 'react-native-autogrow-textinput';
 import TimeAgo from 'react-native-timeago';
+import FirebaseSvc from '../../assets/services/FirebaseSvc';
 
 export default class Detail extends Component {
   constructor(props) {
     super(props);
+		this.unsubscribe=null;
     this.item = this.props.navigation.getParam('item', {});
+		this.user = FirebaseSvc.getCurrentUser();
+		console.log("item", this.item);
 
     this.state = {
-      comments: [{ key: "1", id: 1, name:"Tono", message:"Comment 1", avatar: 'https://cdn-images-1.medium.com/max/1600/1*t_G1kZwKv0p2arQCgYG7IQ.gif', time:new Date() },
-                { key: "2", id: 2, name:"Budi", message:"Comment 2", avatar: 'https://cdn-images-1.medium.com/max/1600/1*t_G1kZwKv0p2arQCgYG7IQ.gif', time:new Date() }],
+      comments: [],
       refresh: false,
-      selectedCommentId: [],
       text: '',
     }
   }
+
+	componentDidMount = async () => {
+		this.unsubscribe = await FirebaseSvc
+      .getPostRef(this.item.id)
+      .onSnapshot(this.fetchPost);
+	}
+
+
+
   goToPage = () => {
     this.props.navigation.navigate("Profile");
   }
 
-  _menu=null;
-
-  setMenuRef = ref => {
-    this._menu = ref;
-  };
-
-  hideMenu = () => {
-    this._menu.hide();
-  };
-
-  showMenu = () => {
-    this._menu.show();
-  };
 
   _renderItem = ({item}) => {
     return (
@@ -136,21 +134,13 @@ export default class Detail extends Component {
                 </Body>
               </Left>
               <Right>
-                <Menu
-                  ref={this.setMenuRef}
-                  button={
-                    <Button transparent onPress={this.showMenu}>
-                      <MaterialIcon
-                        name={"more-horiz"}
-                        size={30}
-                        color="#87838B"
-                      />
-                    </Button>
-                  }
-                >
-                  <MenuItem onPress={this.hideMenu}>Edit</MenuItem>
-                  <MenuItem onPress={this.hideMenu}>Delete</MenuItem>
-                </Menu>
+								<Button transparent onPress={this.showMenu}>
+									<MaterialIcon
+										name={"more-horiz"}
+										size={30}
+										color="#87838B"
+									/>
+								</Button>
               </Right>
             </CardItem>
             <CardItem bordered>
