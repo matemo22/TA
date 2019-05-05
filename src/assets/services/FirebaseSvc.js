@@ -252,13 +252,17 @@ class FirebaseSvc {
   }
 
   createTodo = (todo, success_callback) => {
+		var todos = todo.todo;
+		todos.pop();
     this.firestore.collection("todos").add({
       title: todo.title,
       gid: todo.gid,
       cid: todo.cid,
       roles: todo.roles,
-      todo: todo.todo,
-      completed: false,
+      todo: todos,
+			reminder: todo.reminder,
+			time_reminder: todo.time_reminder,
+      completed: todo.completed,
     })
     .then(success_callback, function(error) {
       console.error("Failed to create Todo", error);
@@ -340,6 +344,46 @@ class FirebaseSvc {
     .then(success_callback, function(error) {
       console.error("Error Update Role", error);
     })
+  }
+
+	updateEvent = (event, success_callback) => {
+		let batch = this.firestore.batch();
+    let ref = this.firestore.collection("event").doc(event.id);
+    batch.update(ref, {
+			title: event.title,
+      time: event.time,
+      note: event.note,
+      reminder: event.reminder,
+      gid: event.gid,
+      time_reminder: event.time_reminder,
+      cid: event.cid,
+      roles: event.roles,
+    });
+    batch.commit()
+    .then(success_callback, (error)=>{
+      console.error("Error update Event", error);
+    });
+  }
+
+	updateTodo = (todo, success_callback) => {
+		let batch = this.firestore.batch();
+    let ref = this.firestore.collection("todos").doc(todo.id);
+		var todos = todo.todo;
+		todos.pop();
+		batch.update(ref, {
+			title: todo.title,
+      gid: todo.gid,
+      cid: todo.cid,
+      roles: todo.roles,
+      todo: todos,
+			reminder: todo.reminder,
+			time_reminder: todo.time_reminder,
+      completed: todo.completed,
+    });
+    batch.commit()
+    .then(success_callback, (error)=>{
+      console.error("Error update Todo", error);
+    });
   }
 
   updateUserRole = (item, success_callback) => {

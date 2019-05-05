@@ -40,6 +40,8 @@ import CategoryChatroom from './src/pages/group/CategoryChatroom';
 import EventTodos from './src/pages/event_todo/EventTodos';
 import CreateEvent from './src/pages/event_todo/CreateEvent';
 import CreateTodo from './src/pages/event_todo/CreateTodo';
+import DetailEvent from './src/pages/event_todo/DetailEvent';
+import DetailTodo from './src/pages/event_todo/DetailTodo';
 
 //##TabNavigator
 //->Planner
@@ -274,6 +276,12 @@ const EventStack = createStackNavigator({
   CreateTodo: {
     screen: CreateTodo,
   },
+	DetailEvent: {
+		screen: DetailEvent,
+	},
+	DetailTodo: {
+		screen: DetailTodo,
+	},
   Notes: {
     screen: NotesStack,
   },

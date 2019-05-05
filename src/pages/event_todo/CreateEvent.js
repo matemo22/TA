@@ -38,6 +38,7 @@ export default class CreateEvent extends Component {
     this.unsubscribeRole = null;
 		this.group = this.props.navigation.getParam('group', {empty: true});
     this.item = this.props.navigation.getParam('item', {empty: true});
+		this.category = this.props.navigation.getParam('category', []);
 
     this.state = {
       name:'',
@@ -46,14 +47,18 @@ export default class CreateEvent extends Component {
       roleStatus: false,
 			refresh: false,
       isDateTimePickerVisible: false,
+			isDateTimePickerVisible2: false,
       dateText: '',
       hourText: '',
-      date: '',
+      date: new Date(),
+			dateText2: '',
+      hourText2: '',
+      date2: new Date(),
 			selectedRoles: [],
       selectedTime: '',
       selectedCategoryId: this.item.id || '',
       selectedCategory: this.item || '',
-      category: [],
+      category: this.category,
       role: [],
       availableRole: [],
       group: [],
@@ -65,10 +70,8 @@ export default class CreateEvent extends Component {
   }
 
   componentDidMount = async () => {
-    this._convert(new Date());
-    this.unsubscribeCategory = await FirebaseSvc
-      .getCategoryRef(this.group.id)
-      .onSnapshot(this.fetchCategory);
+    this._convert(this.state.date);
+		this._convert2(this.state.date2);
     this.unsubscribeRole = await FirebaseSvc
       .getRoleRef(this.group.id)
       .onSnapshot(this.fetchRole);
@@ -76,23 +79,6 @@ export default class CreateEvent extends Component {
 
   componentWillUnmount = () => {
     this.unsubscribeRole();
-    this.unsubscribeCategory();
-  }
-
-  fetchCategory = (querySnapshot) => {
-    let category = [];
-    querySnapshot.forEach( (doc) => {
-      category.push({
-        doc: doc,
-        data: doc.data(),
-        id: doc.id,
-        title: doc.data().name,
-      });
-    });
-    this.setState({
-      category: category,
-      refresh: !this.state.refresh,
-    });
   }
 
   fetchRole = (querySnapshot) => {
@@ -204,6 +190,8 @@ export default class CreateEvent extends Component {
   onChangeTextNote = (note) => {this.setState({note: note.nativeEvent.text || '', noteEdited: true});}
   _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
   _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+	_showDateTimePicker2 = () => this.setState({ isDateTimePickerVisible2: true });
+  _hideDateTimePicker2 = () => this.setState({ isDateTimePickerVisible2: false });
 
   _convert = (date) => {
     var month_names =["Jan","Feb","Mar",
@@ -231,9 +219,41 @@ export default class CreateEvent extends Component {
 		});
 	}
 
+	_convert2 = (date) => {
+    var month_names =["Jan","Feb","Mar",
+                      "Apr","May","Jun",
+                      "Jul","Aug","Sep",
+                      "Oct","Nov","Dec"];
+    var day = date.getDate();
+    var month_index = date.getMonth();
+    var year = date.getFullYear();
+    var dateText = day + "-" + month_names[month_index] + "-" + year;
+
+		var hours = date.getHours();
+		var minutes = date.getMinutes();
+		var minute = "";
+		var hour = "";
+		if(hours<10) hour="0"+hours;
+		else hour = hours;
+		if(minutes<10) minute="0"+minutes;
+		else minute = minutes;
+		var hourText = hour+":"+minute;
+		this.setState({
+      date2: date,
+			dateText2: dateText,
+			hourText2: hourText,
+		});
+	}
+
   _handleDatePicked = (date) => {
     this._hideDateTimePicker();
 		this._convert(date);
+		this._convert2(date);
+  };
+
+	_handleDatePicked2 = (date) => {
+    this._hideDateTimePicker2();
+		this._convert2(date);
   };
 
   createEvent = () => {
@@ -243,7 +263,7 @@ export default class CreateEvent extends Component {
       note: this.state.note,
       reminder: this.state.reminder,
       gid: this.group.id,
-      time_reminder: this.state.selectedTime,
+      time_reminder: this.state.date2,
       cid: this.state.selectedCategory.id || '',
       roles: this.state.selectedRoles,
     };
@@ -359,28 +379,18 @@ export default class CreateEvent extends Component {
 							</View>
 						</View>
 						{ this.state.reminder ?
-							<View style={{margin: 16, borderBottomWidth: 1, borderBottomColor: '#F2F0F3'}}>
-								<Text
-                  style={{textTransform: 'uppercase', fontSize: 12, color: '#757575'}}>
-                  Set Time to get Reminder
-                </Text>
-                <Picker
-                  iosIcon={<Icon name="down-square-o" color="#757575"/>}
-                  mode="dropdown"
-                  placeholder="Remind me"
-                  textStyle={{ color: "#757575", fontSize: 12 }}
-                  selectedValue={this.state.selectedTime}
-                  onValueChange={this.onPickerReminderChange.bind(this)}>
-                  <Picker.Item label="5 mins before event" value="5" />
-                  <Picker.Item label="10 mins before event" value="10" />
-                  <Picker.Item label="1 hour before event" value="60" />
-                  <Picker.Item label="2 hours before event" value="120" />
-                  <Picker.Item label="12 hours before event" value="720" />
-                  <Picker.Item label="1 day before event" value="1440" />
-                </Picker>
+							<View>
+								<Item floatingLabel onPress={this._showDateTimePicker2}>
+									<Label onPress={this._showDateTimePicker2}>Remind Me At</Label>
+									<Input disabled value={this.state.dateText2+" "+this.state.hourText2} onPress={this._showDateTimePicker2}/>
+								</Item>
+								<View style={{marginTop: 16, marginLeft: 16, marginRight: 16, borderBottomColor: '#F2F0F3', borderBottomWidth: 1, paddingBottom: 16}}>
+									<Text style={{color: '#298CFB'}}
+										onPress={this._showDateTimePicker2}>Select Date</Text>
+								</View>
 							</View>
-							:
-							<View></View>
+						:
+						<View></View>
 						}
             { this.group && !this.group.empty ?
               <View>
@@ -410,12 +420,12 @@ export default class CreateEvent extends Component {
   										renderItem={this.renderRole}
   									/>
     							</View>
-    							:
-    							<View></View>
+								:
+								<View></View>
     						}
               </View>
-              :
-              <View></View>
+						:
+						<View></View>
             }
           </Form>
           <DateTimePicker
@@ -423,6 +433,13 @@ export default class CreateEvent extends Component {
 	          onConfirm={this._handleDatePicked}
 	          onCancel={this._hideDateTimePicker}
 						mode="datetime"
+	        />
+					<DateTimePicker
+	          isVisible={this.state.isDateTimePickerVisible2}
+	          onConfirm={this._handleDatePicked2}
+	          onCancel={this._hideDateTimePicker2}
+						mode="datetime"
+						maximumDate={this.state.date}
 	        />
         </Content>
       </Container>

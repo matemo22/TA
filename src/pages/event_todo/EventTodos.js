@@ -247,8 +247,8 @@ export default class EventTodos extends Component {
             </Col>
             <Col style={{alignItems: 'flex-end', justifyContent: 'center'}}>
               <View style={{flexDirection: 'row'}}>
-                <Icon style={{marginRight: 10}} name="plus" onPress={()=>{this.showActionSheet(node.doc)}}/>
-                <Icon name={node.opened ? "up" : "down"} style={{marginRight: 10}}/>
+                <Icon style={{marginRight: 10}} name="plus" size={20} onPress={()=>{this.showActionSheet(node.doc)}}/>
+                <Icon name={node.opened ? "up" : "down"} size={20} style={{marginRight: 10}}/>
               </View>
             </Col>
           </Grid>
@@ -264,7 +264,7 @@ export default class EventTodos extends Component {
     		var hourText = this._convertTime(date);
         temp.push(
           <ListItem
-            onPress={()=>{console.log("Go To Event");}}
+            onPress={()=>{this.props.navigation.navigate("DetailEvent", {group: this.group, item: node.category, event: node, category: this.state.category})}}
             key={node.id} avatar>
             <Body>
               <Text>{node.doc.title}</Text>
@@ -295,6 +295,7 @@ export default class EventTodos extends Component {
           }
           temp.push(
             <ListItem
+							onPress={()=>{this.props.navigation.navigate("DetailTodo", {group: this.group, item: node.category, todo: node, category: this.state.category})}}
               key={node.id} avatar>
               <Body>
                 <Text>{node.doc.title}</Text>
@@ -320,10 +321,10 @@ export default class EventTodos extends Component {
     },
     (buttonIndex) => {
       if(buttonIndex == 0) {
-        this.props.navigation.navigate("CreateEvent", {group: this.group, item: item});
+        this.props.navigation.navigate("CreateEvent", {group: this.group, item: item, category: this.state.category});
       }
       else if(buttonIndex == 1) {
-        this.props.navigation.navigate("CreateTodo", {group: this.group, item: item});
+        this.props.navigation.navigate("CreateTodo", {group: this.group, item: item, category: this.state.category});
       }
     });
   }
@@ -342,7 +343,8 @@ export default class EventTodos extends Component {
         for (var j = 0; j < event.length; j++) {
           if(event[j].data.cid === category[i].id) {
             var doc = event[j].data;
-            arr.push({type:"event", id: event[j].id, doc});
+						var tempCategory = category[i];
+            arr.push({type:"event", id: event[j].id, doc, category: tempCategory});
           }
         }
       }
@@ -350,7 +352,8 @@ export default class EventTodos extends Component {
         for (var j = 0; j < todo.length; j++) {
           if(todo[j].data.cid === category[i].id) {
             var doc = todo[j].data;
-            arr.push({type:"todo", id: todo[j].id, doc});
+						var tempCategory = category[i];
+            arr.push({type:"todo", id: todo[j].id, doc, category: tempCategory});
           }
         }
       }

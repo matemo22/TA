@@ -37,9 +37,9 @@ export default class CreateEvent extends Component {
   constructor(props){
     super(props);
     this.unsubscribeRole = null;
-    this.unsubscribeCategory = null;
     this.group = this.props.navigation.getParam('group', {empty: true});
     this.item = this.props.navigation.getParam('item', {empty: true});
+		this.category = this.props.navigation.getParam('category', []);
 
     this.state = {
       name:'',
@@ -47,18 +47,18 @@ export default class CreateEvent extends Component {
       reminder: false,
       roleStatus: false,
 			refresh: false,
-      isDateTimePickerVisible: false,
-      dateText: '',
-      hourText: '',
-      date: '',
-      todo: [],
+      isDateTimePickerVisible2: false,
+			dateText2: '',
+      hourText2: '',
+      date2: new Date(),
+      todo: [{title: "", completed: false,}],
 			selectedRoles: [],
       selectedTime: '',
       selectedCategoryId: this.item.id || '',
       selectedCategory: this.item || '',
       selectedGroup: '',
       selectedChatroom: '',
-      category: [],
+      category: this.category,
       role: [],
       availableRole: [],
       nameEdited: false,
@@ -68,10 +68,7 @@ export default class CreateEvent extends Component {
   }
 
   componentDidMount = async () => {
-    this._convert(new Date());
-    this.unsubscribeCategory = await FirebaseSvc
-      .getCategoryRef(this.group.id)
-      .onSnapshot(this.fetchCategory);
+		this._convert2(this.state.date2);
     this.unsubscribeRole = await FirebaseSvc
       .getRoleRef(this.group.id)
       .onSnapshot(this.fetchRole);
@@ -79,23 +76,6 @@ export default class CreateEvent extends Component {
 
   componentWillUnmount = () => {
     this.unsubscribeRole();
-    this.unsubscribeCategory();
-  }
-
-  fetchCategory = (querySnapshot) => {
-    let category = [];
-    querySnapshot.forEach( (doc) => {
-      category.push({
-        doc: doc,
-        data: doc.data(),
-        id: doc.id,
-        title: doc.data().name,
-      });
-    });
-    this.setState({
-      category: category,
-      refresh: !this.state.refresh,
-    });
   }
 
   fetchRole = (querySnapshot) => {
@@ -130,17 +110,6 @@ export default class CreateEvent extends Component {
     });
   }
 
-  reminderChange = (value) => {
-    var selectedTime = this.state.selectedTime;
-    if(!value) {
-      selectedTime = '';
-    }
-		this.setState({
-			reminder: value,
-      selectedTime: selectedTime,
-		});
-	}
-
   roleStatusChange = (value) => {
     var selectedRoles = this.state.selectedRoles;
     if(!value) {
@@ -153,11 +122,16 @@ export default class CreateEvent extends Component {
 		});
 	}
 
-  onPickerReminderChange = (value: string) => {
-    this.setState({
-      selectedTime: value,
-    });
-  }
+	reminderChange = (value) => {
+    var selectedTime = this.state.selectedTime;
+    if(!value) {
+      selectedTime = '';
+    }
+		this.setState({
+			reminder: value,
+      selectedTime: selectedTime,
+		});
+	}
 
   onPickerCategoryChange = (id) => {
     let value = this.state.category.find(item => item.id === id);
@@ -205,10 +179,10 @@ export default class CreateEvent extends Component {
 
   onChangeTextName = (name) => {this.setState({name, nameEdited: true});}
   onChangeTodo = (data) => {this.setState({data});}
-  _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
-  _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+	_showDateTimePicker2 = () => this.setState({ isDateTimePickerVisible2: true });
+  _hideDateTimePicker2 = () => this.setState({ isDateTimePickerVisible2: false });
 
-  _convert = (date) => {
+	_convert2 = (date) => {
     var month_names =["Jan","Feb","Mar",
                       "Apr","May","Jun",
                       "Jul","Aug","Sep",
@@ -228,15 +202,15 @@ export default class CreateEvent extends Component {
 		else minute = minutes;
 		var hourText = hour+":"+minute;
 		this.setState({
-      date: date,
-			dateText: dateText,
-			hourText: hourText,
+      date2: date,
+			dateText2: dateText,
+			hourText2: hourText,
 		});
 	}
 
-  _handleDatePicked = (date) => {
-    this._hideDateTimePicker();
-		this._convert(date);
+	_handleDatePicked2 = (date) => {
+    this._hideDateTimePicker2();
+		this._convert2(date);
   };
 
   createTodo = () => {
@@ -247,6 +221,9 @@ export default class CreateEvent extends Component {
         cid: this.state.selectedCategory.id || '',
         roles: this.state.selectedRoles,
         todo: this.state.todo,
+				reminder: this.state.reminder,
+				time_reminder: this.state.date2,
+				completed: !this.state.todo.some(t => t.completed === false),
       };
       FirebaseSvc.createTodo(todo, this.createSuccess());
     }
@@ -275,25 +252,6 @@ export default class CreateEvent extends Component {
     });
   }
 
-  addTodo = () => {
-    if(this.state.data != '') {
-      var list = this.state.todo;
-      var data = {
-        title: this.state.data,
-        completed: false,
-      };
-      list.push(data);
-      this.setState({
-        todo: list,
-        data: '',
-        refresh: !this.state.refresh,
-      });
-    }
-    else {
-      alert("Input Todo cannot be empty");
-    }
-  }
-
   checkItem = (item) => {
     let tmp = this.state.todo;
     if ( tmp.includes( item ) ) {
@@ -306,16 +264,54 @@ export default class CreateEvent extends Component {
     });
   }
 
-  _renderTodo = ({item}) => {
+	onChangeTextTodo = (item, text) => {
+    let tmp = this.state.todo;
+    if ( tmp.includes( item ) ) {
+      var i = tmp.indexOf(item);
+			if(i==tmp.length-1) {
+				tmp.push({title: "", completed: false,});
+			}
+			if(text.length!=0) {
+				tmp[i].title = text;
+			}
+			else {
+				tmp.splice( i, 1 );
+			}
+    }
+    this.setState({
+      todo: tmp,
+      refresh: !this.state.refresh,
+    });
+  }
+
+	_renderTodo = ({item}) => {
     return (
       <ListItem>
-        <CheckBox checked={item.completed} onPress={()=>{this.checkItem(item)}}/>
+				{
+					item.title.length!=0
+						?
+							<CheckBox checked={item.completed} onPress={()=>{this.checkItem(item)}}/>
+						:
+						<View></View>
+				}
         <Left>
-          <Text style={{marginLeft: 10}}>{item.title}</Text>
+					<Input
+						value={item.title}
+						placeholder="Input Todo"
+						style={ item.completed ?
+							{color: "#777777"} : {}
+						}
+						onChangeText={(text)=>{this.onChangeTextTodo(item, text)}}/>
         </Left>
         <Right>
-          <Icon name="close"
-            onPress={() => {this.removeTodo(item)}}/>
+					{
+						item.title.length != 0 ?
+							<Icon name="close"
+								onPress={() => {this.removeTodo(item)}}/>
+						:
+						<View></View>
+					}
+
         </Right>
       </ListItem>
     )
@@ -377,26 +373,11 @@ export default class CreateEvent extends Component {
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={this._renderTodo}
                   />
-                  :
-                  <View>
-                  </View>
+								:
+								<View>
+								</View>
                 }
               </View>
-            </View>
-
-            <View style={{flexDirection: 'row', borderBottomColor: '#F2F0F3', borderBottomWidth: 1}}>
-              <Item style={{marginLeft: 11, width: "80%", borderBottomColor: 'transparent'}}>
-                <Input onChangeText={(data)=>{this.onChangeTodo(data)}}
-                  value={this.state.data}
-                  placeholder="Input Todo"
-                  placeholderTextColor="#F2F0F3" />
-              </Item>
-              <Button
-                transparent
-                onPress={()=>{this.addTodo()}}
-                style={{marginTop: 5, marginRight: 15}}>
-                <Text>Add</Text>
-              </Button>
             </View>
             <View style={{margin: 16, borderBottomColor: '#F2F0F3', borderBottomWidth: 1, paddingBottom: 16}}>
               <Text style={{color: '#757575'}}>Select Category</Text>
@@ -427,28 +408,18 @@ export default class CreateEvent extends Component {
 							</View>
 						</View>
 						{ this.state.reminder ?
-							<View style={{margin: 16, borderBottomWidth: 1, borderBottomColor: '#F2F0F3'}}>
-								<Text
-                  style={{textTransform: 'uppercase', fontSize: 12, color: '#757575'}}>
-                  Set Time to get Reminder
-                </Text>
-                <Picker
-                  iosIcon={<Icon name="down-square-o" color="#757575"/>}
-                  mode="dropdown"
-                  placeholder="Remind me"
-                  textStyle={{ color: "#757575", fontSize: 12 }}
-                  selectedValue={this.state.selectedTime}
-                  onValueChange={this.onPickerReminderChange.bind(this)}>
-                  <Picker.Item label="5 mins before event" value="5" />
-                  <Picker.Item label="10 mins before event" value="10" />
-                  <Picker.Item label="1 hour before event" value="60" />
-                  <Picker.Item label="2 hours before event" value="120" />
-                  <Picker.Item label="12 hours before event" value="720" />
-                  <Picker.Item label="1 day before event" value="1440" />
-                </Picker>
+							<View>
+								<Item floatingLabel onPress={this._showDateTimePicker2}>
+									<Label onPress={this._showDateTimePicker2}>Remind Me At</Label>
+									<Input disabled value={this.state.dateText2+" "+this.state.hourText2} onPress={this._showDateTimePicker2}/>
+								</Item>
+								<View style={{marginTop: 16, marginLeft: 16, marginRight: 16, borderBottomColor: '#F2F0F3', borderBottomWidth: 1, paddingBottom: 16}}>
+									<Text style={{color: '#298CFB'}}
+										onPress={this._showDateTimePicker2}>Select Date</Text>
+								</View>
 							</View>
-							:
-							<View></View>
+						:
+						<View></View>
 						}
             { this.group && !this.group.empty ?
               <View>
@@ -487,19 +458,20 @@ export default class CreateEvent extends Component {
   										}
   									/>
     							</View>
-    							:
-    							<View></View>
+								:
+								<View></View>
     						}
               </View>
-              :
-              <View></View>
+						:
+						<View></View>
             }
           </Form>
-          <DateTimePicker
-	          isVisible={this.state.isDateTimePickerVisible}
-	          onConfirm={this._handleDatePicked}
-	          onCancel={this._hideDateTimePicker}
+					<DateTimePicker
+	          isVisible={this.state.isDateTimePickerVisible2}
+	          onConfirm={this._handleDatePicked2}
+	          onCancel={this._hideDateTimePicker2}
 						mode="datetime"
+						maximumDate={this.state.date}
 	        />
         </Content>
       </Container>

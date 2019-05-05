@@ -124,7 +124,7 @@ export default class AllFiles extends Component {
 		}
     temp.push(
 			<SwipeRow
-				disableLeftSwipe={true}
+				leftOpenValue={75}
 				rightOpenValue={-75}
 				key={item.id}
 				body={
