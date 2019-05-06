@@ -189,15 +189,14 @@ export default class Create extends Component {
   }
 
   _resetTextInput() {
-    this._commentRef.clear();
-    this._commentRef.resetHeightToMin();
+    this._textRef.clear();
+    this._textRef.resetHeightToMin();
   }
 
 	createPost = () => {
     if(this.state.text!="") {
       var post = {
         text: this.state.text,
-				comment: [],
 				createdAt: new Date(),
 				createdBy: {
 					avatar: this.user.photoURL,
@@ -279,7 +278,7 @@ export default class Create extends Component {
 							value={this.state.text}
 							enableScrollToCaret
 							ref={r => {
-								this._commentRef = r;
+								this._textRef = r;
 							}}
 						/>
 					</Item>

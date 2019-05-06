@@ -23,7 +23,7 @@ import {
   Form,
   Item,
   Input,
-  Textarea
+  ActionSheet,
 } from 'native-base';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { DrawerActions } from 'react-navigation';
@@ -36,70 +36,137 @@ import FirebaseSvc from '../../assets/services/FirebaseSvc';
 export default class Detail extends Component {
   constructor(props) {
     super(props);
-		this.unsubscribe=null;
+		this.unsubscribeComment=null;
     this.item = this.props.navigation.getParam('item', {});
 		this.user = FirebaseSvc.getCurrentUser();
-		console.log("item", this.item);
 
     this.state = {
       comments: [],
+			user: [],
       refresh: false,
       text: '',
     }
   }
 
 	componentDidMount = async () => {
-		this.unsubscribe = await FirebaseSvc
-      .getPostRef(this.item.id)
-      .onSnapshot(this.fetchPost);
+		this.unsubscribeComment = await FirebaseSvc
+      .getCommentRef(this.item.id)
+      .onSnapshot(this.fetchComment);
+		this.unsubscribeUser = await FirebaseSvc
+			.getAllUserRefByGId(this.item.data.gid)
+			.onSnapshot(this.fetchUser);
 	}
 
+	componentWillUnmount = () => {
+		this.unsubscribeComment();
+	}
 
+	fetchComment = (querySnapshot) => {
+    let comments = [];
+    querySnapshot.forEach( (doc) => {
+      comments.push({
+        doc: doc,
+        data: doc.data(),
+        id: doc.id,
+      });
+    });
+    this.setState({
+      comments: comments,
+      refresh: !this.state.refresh,
+    });
+  }
+
+	fetchUser = (querySnapshot) => {
+    let user = [];
+    querySnapshot.forEach( (doc) => {
+      user.push({
+        doc: doc,
+        data: doc.data(),
+        id: doc.id,
+      });
+    });
+    this.setState({
+      user: user,
+      refresh: !this.state.refresh,
+    });
+  }
 
   goToPage = () => {
     this.props.navigation.navigate("Profile");
   }
 
-
   _renderItem = ({item}) => {
-    return (
-      <ListItem avatar>
-        <Left>
-          <Thumbnail source={{ uri: item.avatar }} />
-        </Left>
-        <Body>
-          <Text style={{fontWeight: 'bold'}}>{item.name}</Text>
-          <Text style={{fontSize: 14}}>{item.message}</Text>
-          <Text note><TimeAgo time={item.time} interval={60000}/></Text>
-        </Body>
-      </ListItem>
-    )
+		let tmp = this.state.user;
+    if ( tmp.some(t=>t.id==item.data.uid ) ) {
+      var i = tmp.findIndex(t=>t.id == item.data.uid);
+      var user = tmp[i];
+			var url = user.data.photoURL;
+			return (
+				<ListItem avatar>
+					<Left>
+						{
+							url != "" ?
+								<Thumbnail source={{ uri: user.data.photoURL }} />
+							:
+							<View></View>
+						}
+					</Left>
+					<Body>
+						<Text style={{fontWeight: 'bold'}}>{user.data.displayName}</Text>
+						<Text style={{fontSize: 14}}>{item.data.text}</Text>
+						<Text note><TimeAgo time={item.data.createdAt} interval={60000}/></Text>
+					</Body>
+				</ListItem>
+			)
+    }
   }
 
   _onChange = (event) => {
     this.setState({ text: event.nativeEvent.text || '' });
   }
 
-  _resetTextInput() {
+  _resetTextInput = () => {
     this._commentRef.clear();
     this._commentRef.resetHeightToMin();
   }
 
+	_focusTextInput = () => {
+		this._commentRef.focus();
+	}
+
   addComment = () => {
-    let tmp = this.state.comments;
-    var key = tmp.length+1;
-    var newComment = { key: key+"", id: 3, name: 'Matemo', message:this.state.text, avatar: 'https://cdn-images-1.medium.com/max/1600/1*t_G1kZwKv0p2arQCgYG7IQ.gif', time:new Date() }
-    tmp.push(newComment);
-    this.setState({
-      comments: tmp,
-      refresh: !this.state.refresh,
-    });
+    var comment = {
+			createdAt: new Date(),
+			nid: this.item.id,
+			text: this.state.text,
+			uid: this.user.uid,
+		}
+		FirebaseSvc.addComment(comment);
     this._resetTextInput();
-    // this.flatlist.scrollToEnd();
-    // this.content._root.scrollToEnd();
+  }
+
+	showMenu = (item) => {
+    var BUTTONS = ["Edit", "Delete", "Cancel"];
+    var DESTRUCTIVE_INDEX = 1;
+    var CANCEL_INDEX = 2;
+    ActionSheet.show(
+    {
+      options: BUTTONS,
+      destructiveButtonIndex: DESTRUCTIVE_INDEX,
+      cancelButtonIndex: CANCEL_INDEX,
+    },
+    (buttonIndex) => {
+      if(buttonIndex == 0) {
+        this.props.navigation.navigate("CreateNotes", {item: item});
+      }
+      else if(buttonIndex == 1) {
+        console.log("Delete Notes");
+      }
+    });
   }
 
   render() {
+		let avatar = this.item.data.createdBy.avatar;
     return (
       <Container>
         <Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC"}}>
@@ -124,72 +191,70 @@ export default class Detail extends Component {
           ref={c => (this.content = c)}
         >
           <Card style={{flex: 0}}>
-            <CardItem header bordered>
+						<CardItem header bordered>
+		          <Left>
+		            { avatar != "" ?
+		              <Thumbnail source={{uri: avatar}} />
+								:
+								<View></View>
+		            }
+		            <Body>
+		              <Text>{this.item.data.createdBy.name}</Text>
+		              <Text></Text>
+		              <Text note><TimeAgo time={this.item.data.createdAt} interval={1000}/></Text>
+		            </Body>
+		          </Left>
+		          <Right>
+		            <Button transparent onPress={this.user.uid == this.item.data.createdBy.uid ? this.showMenu : console.log("Pressed")}>
+		              <MaterialIcon
+		                name={"more-horiz"}
+		                size={30}
+		                color="#87838B"
+		              />
+		            </Button>
+		          </Right>
+		        </CardItem>
+						<CardItem bordered>
+		          <Body>
+								<Text>
+									{this.item.data.text}
+								</Text>
+		            <Grid>
+		              <Col>
+		                <Button
+		                  transparent
+											onPress={()=>{this._focusTextInput()}}
+		                  style={{justifyContent: 'center', alignItems: 'center'}}>
+		                  <MaterialIcon name="comment" />
+		                  <Text style={{color: '#87838B'}}>Comment</Text>
+		                </Button>
+		              </Col>
+		            </Grid>
+		          </Body>
+		        </CardItem>
+            <CardItem bordered>
               <Left>
-                <Thumbnail
-                  source={{uri: 'https://cdn-images-1.medium.com/max/1600/1*t_G1kZwKv0p2arQCgYG7IQ.gif'}} />
-                <Body>
-                  <Text>NativeBase</Text>
-                  <Text note>April 15, 2016</Text>
-                </Body>
               </Left>
               <Right>
-								<Button transparent onPress={this.showMenu}>
-									<MaterialIcon
-										name={"more-horiz"}
-										size={30}
-										color="#87838B"
-									/>
-								</Button>
-              </Right>
-            </CardItem>
-            <CardItem bordered>
-              <Body>
-                <Image source={{uri: 'https://cdn-images-1.medium.com/max/1600/1*t_G1kZwKv0p2arQCgYG7IQ.gif'}} style={{height: 200, width: 200, flex: 1}}/>
-                <Text onPress={()=>{this.props.navigation.navigate('DetailNotes')}}>
-                  {`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at dictum sem. Cras et purus arcu. Cras dignissim ipsum ut sodales porttitor. Curabitur faucibus id lorem vitae suscipit. In et ultrices dolor. Integer magna velit, dignissim blandit feugiat eget, ultricies eu turpis. In sodales lacinia augue, ac porta purus pharetra id.
-                  \nCurabitur tristique, dui sit amet accumsan tincidunt, urna lacus convallis tellus, eu porta est tellus eget dolor. Integer rhoncus, magna placerat venenatis maximus, elit ligula tristique ipsum, nec vestibulum quam lorem a arcu. Nulla at condimentum odio. Etiam condimentum dictum diam ac convallis. Suspendisse in sodales arcu. Ut non tristique massa. Curabitur rhoncus, erat eu consectetur gravida, orci lacus iaculis odio, vel ornare lacus ex vitae leo. Quisque ut odio commodo, rhoncus nisi quis, consequat magna. Integer in purus facilisis, euismod ex eget, feugiat ipsum. Pellentesque fermentum vestibulum tristique. In non dolor ligula. Aliquam volutpat, quam a semper vestibulum, dolor lacus rutrum augue, eget pulvinar est ante ac nunc. Donec posuere enim orci, id bibendum velit tempor in. Donec consequat ultricies ligula id dapibus.`}
-                </Text>
-                <Grid>
-                  <Col>
-                    <Button
-                      transparent
-                      onPress={()=>{this.props.navigation.navigate('DetailNotes', {item: item})}}
-                      style={{justifyContent: 'center', alignItems: 'center'}}>
-                      <MaterialIcon name="comment" />
-                      <Text style={{color: '#87838B'}}>Comment</Text>
-                    </Button>
-                  </Col>
-                </Grid>
-              </Body>
-            </CardItem>
-            <CardItem bordered>
-              <Left>
-              </Left>
-              <Right>
-                <Text note>2 Comments</Text>
-              </Right>
+                <Text note>{this.state.comments.length} Comment{this.state.comments.length>1 ? "s" : ""}</Text>
+							</Right>
             </CardItem>
           </Card>
-          <List>
-            <FlatList
-              data={this.state.comments}
-              extraData={this.state.refresh}
-              renderItem={this._renderItem}
-              keyExtractor={item => item.key}
-              ref={c => (this.flatlist = c)}
-            />
-          </List>
+					<FlatList
+            data={this.state.comments}
+            extraData={this.state.refresh}
+            renderItem={this._renderItem}
+            keyExtractor={item => item.id}
+          />
         </Content>
-        <Footer>
+        <Footer style={{backgroundColor:"#1C75BC"}}>
           <Item regular
             style={{ width: "98%", borderLeftWidth: 0, borderRightWidth: 0, }}>
             <AutoGrowingTextInput
-              // value={this.state.textValue}
-              // onChange={(event) => this._onChange(event)}
               onChange={(event)=>{this._onChange(event)}}
-              style={{ marginLeft: 10, width: '85%', marginRight: 10}}
+              style={{ marginLeft: 10, width: '85%', marginRight: 10, color: "#FFFFFF"}}
               placeholder={'Write a comment...'}
+							placeholderTextColor="#FFFFFF"
               maxHeight={100}
               minHeight={20}
               enableScrollToCaret
@@ -197,7 +262,7 @@ export default class Detail extends Component {
                 this._commentRef = r;
               }}
             />
-            <MaterialIcon name="send" size={30} onPress={()=>{this.addComment()}}/>
+            <MaterialIcon name="send" size={30} color="#FFFFFF" onPress={()=>{this.addComment()}}/>
           </Item>
         </Footer>
       </Container>

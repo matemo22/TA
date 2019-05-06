@@ -239,7 +239,6 @@ class FirebaseSvc {
 	createPost = (post, success_callback) => {
     this.firestore.collection("notes").add({
 			text: post.text,
-			comment: post.comment,
 			createdAt: post.createdAt,
 			createdBy: post.createdBy,
 			gid: post.gid,
@@ -249,6 +248,20 @@ class FirebaseSvc {
 			time_reminder: post.time_reminder,
     })
     .then(success_callback, function(error) {
+      console.error("Failed to create Post", error);
+    });
+  }
+
+	addComment = (comment) => {
+    this.firestore.collection("notes_comment").add({
+			text: comment.text,
+			createdAt: comment.createdAt,
+			nid: comment.nid,
+			uid: comment.uid,
+    })
+    .then(function() {
+			console.log("Success Add Comment to PostId "+comment.nid);
+		}, function(error) {
       console.error("Failed to create Post", error);
     });
   }
@@ -517,6 +530,7 @@ class FirebaseSvc {
 
   getEventRef = (gid) => {
     var eventRef = this.firestore.collection("event").where('gid','==',gid);
+		eventRef = eventRef.orderBy("time", "asc");
     return eventRef;
   }
 
@@ -553,6 +567,12 @@ class FirebaseSvc {
   getNotesRef = (gid) => {
     var notesRef = this.firestore.collection("notes").where("gid", "==", gid);
     return notesRef;
+  }
+
+	getCommentRef = (nid) => {
+    var commentRef = this.firestore.collection("notes_comment").where("nid", "==", nid);
+		commentRef = commentRef.orderBy("createdAt", "asc");
+    return commentRef;
   }
 
 	getStorageRef = (gid) => {

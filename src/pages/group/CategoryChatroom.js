@@ -274,24 +274,27 @@ export default class CategoryChatroom extends Component {
             <Text style={{color: "#FFFFFF"}}>{this.group.data.name}</Text>
           </Body>
           <Right>
-            <Icon
-							name="folder1"
-							size={20}
-							color="#FFFFFF"
-							onPress={()=>{this.props.navigation.navigate("FileManagement", {group: this.group})}}
-						/>
-            <Icon
-              color="#FFFFFF"
-              name="profile"
-              size={20}
-              style={{marginLeft: 16}}
-              onPress={()=>{this.props.navigation.navigate("Notes", {group: this.group});}}/>
-            <Icon
-              color="#FFFFFF"
-              name="setting"
-              size={20}
-              style={{marginLeft: 16}}
-              onPress={()=>{this.props.navigation.navigate("Setting", {group: this.group})}}/>
+						<Button transparent onPress={()=>{this.props.navigation.navigate("FileManagement", {group: this.group})}}>
+							<Icon
+								name="folder1"
+								size={20}
+								color="#FFFFFF"
+							/>
+						</Button>
+						<Button transparent onPress={()=>{this.props.navigation.navigate("Notes", {group: this.group});}}>
+							<Icon
+	              color="#FFFFFF"
+	              name="profile"
+	              size={20}
+							/>
+						</Button>
+						<Button transparent onPress={()=>{this.props.navigation.navigate("Setting", {group: this.group})}}>
+							<Icon
+	              color="#FFFFFF"
+	              name="setting"
+	              size={20}
+							/>
+						</Button>
           </Right>
         </Header>
         <Content bounces={false}>
