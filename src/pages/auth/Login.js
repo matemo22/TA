@@ -101,7 +101,7 @@ export default class Login extends Component {
             <Text>Login</Text>
           </Button>
         </Content>
-				<Footer style={{backgroundColor: "#FFFFFF"}}>
+				<Footer style={{backgroundColor: "#FFFFFF", borderTopWidth: 0}}>
 					<Text>
 						<Text>Don't have an account? </Text>
 						<Text style={{color: "#1C75BC"}} onPress={()=>this.onPressSignUp()}>Sign Up</Text>

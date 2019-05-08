@@ -16,12 +16,12 @@ import {
 	Item,
 	Input,
 	Thumbnail,
-  Icon,
 	Toast,
 } from 'native-base';
 import { ImageEditor, } from 'react-native';
 import FirebaseSvc from '../assets/services/FirebaseSvc';
 import ImagePicker from 'react-native-image-picker';
+import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 export default class CreateGroup extends Component {
@@ -74,19 +74,24 @@ export default class CreateGroup extends Component {
 		const img = <Thumbnail large source={{uri: this.state.avatar.uri}} />;
     return (
       <Container>
-				<Header style={{backgroundColor: "#F8F8F8"}}>
+				<Header style={{backgroundColor: "#1C75BC"}}>
 					<Left>
             <Button transparent onPress={()=>{this.props.navigation.goBack()}}>
-              <Icon name="arrow-back"/>
-              <Text>Back</Text>
+							<Icon
+								style={{marginLeft: 10}}
+								name={"left"}
+								size={25}
+								color="#FFFFFF"
+								onPress={()=>{this.props.navigation.goBack()}}
+							/>
             </Button>
 					</Left>
 					<Body>
-						<Text>New Group</Text>
+						<Text style={{color: "#FFFFFF"}}>New Group</Text>
 					</Body>
 					<Right>
 						<Button transparent onPress={()=>{this.onPressCreate()}}>
-							<Text>Create</Text>
+							<Text style={{color: "#FFFFFF"}}>Create</Text>
 						</Button>
 					</Right>
 				</Header>

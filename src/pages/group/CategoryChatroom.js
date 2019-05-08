@@ -288,13 +288,18 @@ export default class CategoryChatroom extends Component {
 	              size={20}
 							/>
 						</Button>
-						<Button transparent onPress={()=>{this.props.navigation.navigate("Setting", {group: this.group})}}>
-							<Icon
-	              color="#FFFFFF"
-	              name="setting"
-	              size={20}
-							/>
-						</Button>
+            {
+              this.state.user!='' && this.state.user.data.roles.some(r=>this.state.role.some(a=>a.id===r && a.data.canEdit)) ?
+              <Button transparent onPress={()=>{this.props.navigation.navigate("Setting", {group: this.group})}}>
+  							<Icon
+  	              color="#FFFFFF"
+  	              name="setting"
+  	              size={20}
+  							/>
+  						</Button>
+              :
+              <View></View>
+            }
           </Right>
         </Header>
         <Content bounces={false}>

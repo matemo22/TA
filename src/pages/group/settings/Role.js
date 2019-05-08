@@ -114,24 +114,20 @@ export default class Role extends Component {
               />
             </Button>
           </Left>
-          <Body stle={{flex: 3}}>
+          <Body style={{flex: 3}}>
+            <Text style={{color: "#FFFFFF"}}>Roles</Text>
           </Body>
           <Right>
+            <Text
+              onPress={()=>{this.props.navigation.navigate("CreateRole", {group: this.group})}}
+              style={{marginRight: 5, color: "#FFFFFF"}}
+            >
+              Add
+            </Text>
           </Right>
         </Header>
         <Content bounces={false}>
           <List>
-            <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
-              <Left><Text>Roles</Text></Left>
-              <Right>
-                <Text
-                  onPress={()=>{this.props.navigation.navigate("CreateRole", {group: this.group})}}
-                  style={{marginRight: 5}}
-                >
-                  Add
-                </Text>
-              </Right>
-            </ListItem>
             <FlatList
               data={this.state.role}
               renderItem={this._renderItem}

@@ -83,15 +83,13 @@ export default class InvitationCode extends Component {
             </Button>
           </Left>
           <Body stle={{flex: 3}}>
+            <Text style={{color: "#FFFFFF"}}>Group Code</Text>
           </Body>
           <Right>
           </Right>
         </Header>
         <Content bounces={false}>
           <List>
-            <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
-              <Text>Group Code</Text>
-            </ListItem>
             <ListItem icon style={{marginLeft: 0}}>
               <Left></Left>
               <Body>
@@ -99,7 +97,7 @@ export default class InvitationCode extends Component {
               </Body>
               <Right style={{marginRight: -10}}>
                 <Button transparent onPress={()=>{this.generateCode()}}>
-                  <Text>New Code</Text>
+                  <Text style={{color: "#1C75BC"}}>New Code</Text>
                 </Button>
               </Right>
             </ListItem>

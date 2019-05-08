@@ -10,7 +10,7 @@ class FirebaseSvc {
 
   generateCode = (length) => {
     var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var possible = "ABCDEFGHJKMNOPQRSTUVWXYZabcdefghjkmnopqrstuvwxyz0123456789";
 
     for (var i = 0; i < length; i++)
       text += possible.charAt(Math.floor(Math.random() * possible.length));
@@ -23,6 +23,7 @@ class FirebaseSvc {
     .signInWithEmailAndPassword(user.email, user.password)
     .then(success_callback, function(error){
       console.log("error login", error);
+      alert(error)
     });
   }
 
@@ -150,16 +151,28 @@ class FirebaseSvc {
           console.log("Error Upload Group Avatar", error);
         });
       }
-
-      let refUser = this.firestore.collection("user").doc(user.uid);
-      this.firestore.runTransaction(function(transaction) {
-        return transaction.get(refUser).then(function(doc) {
-          var groups = [];
-          if(doc.data().groups) {
-            groups = doc.data().groups;
-          }
-          groups.push(docRef.id);
-          transaction.update(refUser, {groups: groups});
+      let id = docRef.id;
+      let userRef = this.firestore.collection("user").doc(user.uid);
+      let roleRef = this.firestore.collection("roles").add({
+        canEdit: true,
+        gid: id,
+        name: "Admin",
+      })
+      .then(async (docRef)=>{
+        this.firestore.runTransaction(function(transaction) {
+          return transaction.get(userRef).then(function(doc) {
+            var groups = [];
+            var roles = [];
+            if(doc.data().groups) {
+              groups = doc.data().groups;
+            }
+            groups.push(id);
+            if(doc.data().roles) {
+              roles = doc.data().roles;
+            }
+            roles.push(docRef.id);
+            transaction.update(userRef, {groups: groups, roles: roles});
+          });
         });
       });
       success_callback;

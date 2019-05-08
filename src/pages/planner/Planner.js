@@ -6,6 +6,8 @@ import {
 	Container,
 	Header,
 	Title,
+	Footer,
+	FooterTab,
 	Content,
 	Button,
 	Body,
@@ -18,48 +20,138 @@ import {
 	Right,
 } from 'native-base';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
-import firebase from 'react-native-firebase';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import FirebaseSvc from '../../assets/services/FirebaseSvc';
+import Icon from 'react-native-vector-icons/AntDesign';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { DrawerActions } from 'react-navigation';
 
 export default class Planner extends Component {
   constructor(props) {
 		super(props);
+		this.unsubscribe = null;
+		this.unsubscribeData = [];
 
 		this.state = {
       items:{},
 		};
 	}
 
-  loadItems(day) {
-    setTimeout(() => {
-      for (let i = -15; i < 85; i++) {
-        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-        const strTime = this.timeToString(time);
-        if (!this.state.items[strTime]) {
-          this.state.items[strTime] = [];
-          const numItems = Math.floor(Math.random() * 5);
-          for (let j = 0; j < numItems; j++) {
-            this.state.items[strTime].push({
-              name: 'Item for ' + strTime,
-              //height: Math.max(50, Math.floor(Math.random() * 150))
-            });
-          }
-        }
-      }
-      //console.log(this.state.items);
-      const newItems = {};
-      Object.keys(this.state.items).forEach(key => { newItems[key] = this.state.items[key];});
-      this.setState({
-        items: newItems
-      });
-    }, 1000);
-    // console.log(`Load Items for ${day.year}-${day.month}`);
-  }
+	componentDidMount = async () => {
+
+	}
+
+	componentWillUnmount = () => {
+		this.unsubscribe();
+		for (var i = 0; i < this.unsubscribeData.length; i++) {
+			this.unsubscribeData[i]();
+		}
+	}
+
+	fetchData = async (doc) => {
+		var data = doc.data();
+		let event = [];
+		for (var i = 0; i < data.groups.length; i++) {
+			this.unsubscribeData[i] = await FirebaseSvc
+				.getEventRef(data.groups[i])
+				.onSnapshot((querySnapshot) => {
+					querySnapshot.forEach((doc)=>{
+						event.push({
+							doc: doc,
+			        data: doc.data(),
+			        id: doc.id,
+						});
+					});
+				});
+		}
+	}
+
+
+
+
+	async loadItems() {
+		let user = FirebaseSvc.getCurrentUser();
+		this.unsubscribe = FirebaseSvc
+			.getUserRef(user.uid)
+			.onSnapshot(async (doc) => {
+				var data = doc.data();
+				let event = [];
+				function formatDate(date) {
+					var d = new Date(date),
+							month = '' + (d.getMonth() + 1),
+							day = '' + d.getDate(),
+							year = d.getFullYear();
+
+					if (month.length < 2) month = '0' + month;
+					if (day.length < 2) day = '0' + day;
+
+					return [year, month, day].join('-');
+				}
+				for (var i = 0; i < data.groups.length; i++) {
+					this.unsubscribeData[i] = await FirebaseSvc
+						.getEventRef(data.groups[i])
+						.onSnapshot(async (querySnapshot) => {
+							await querySnapshot.forEach((doc)=>{
+								event.push({
+									doc: doc,
+					        data: doc.data(),
+					        id: doc.id,
+								});
+							});
+						});
+				}
+				event = await event.sort(function(a,b){
+					return new Date(b.data.time) - new Date(a.data.time);
+				});
+				var tempData = this.state.items;
+				for (var i = 0; i < event.length; i++) {
+					var dateText = formatDate(event[i].data.time);
+					if (!tempData[dateText]) {
+						tempData[dateText] = [];
+					}
+					tempData[dateText].push(event[i]);
+				}
+				console.log("temp", tempData);
+				this.setState({
+					items: tempData,
+				});
+			});
+		// setTimeout(()=>{
+		// 	for (var i = 0; i < this.state.event.length; i++) {
+		// 		this.state.event[i]
+		// 	}
+		// }, 3000);
+	}
+
+  // loadItems(day) {
+	// 	console.log("Day", day);
+  //   setTimeout(() => {
+  //     for (let i = -15; i < 85; i++) {
+  //       const time = day.timestamp + i * 24 * 60 * 60 * 1000;
+  //       const strTime = this.timeToString(time);
+  //       if (!this.state.items[strTime]) {
+  //         this.state.items[strTime] = [];
+  //         const numItems = Math.floor(Math.random() * 5);
+  //         for (let j = 0; j < numItems; j++) {
+  //           this.state.items[strTime].push({
+  //             name: 'Item for ' + strTime,
+  //             //height: Math.max(50, Math.floor(Math.random() * 150))
+  //           });
+  //         }
+  //       }
+  //     }
+  //     //console.log(this.state.items);
+  //     const newItems = {};
+  //     Object.keys(this.state.items).forEach(key => { newItems[key] = this.state.items[key];});
+  //     this.setState({
+  //       items: newItems
+  //     });
+  //   }, 1000);
+  //   // console.log(`Load Items for ${day.year}-${day.month}`);
+  // }
 
   renderItem(item) {
     return (
-      <View style={[styles.item,]}><Text>{item.name}</Text></View>
+      <View style={[styles.item,]}><Text>{item.data.title}</Text></View>
     );
   }
 
@@ -81,28 +173,12 @@ export default class Planner extends Component {
   render() {
     return (
       <Container>
-				<Header>
-          <Left>
-            <Icon
-              style={{marginLeft: 10}}
-              name={"menu"}
-              size={30}
-              color="#298CFB"
-              onPress={()=>{this.props.navigation.dispatch(DrawerActions.toggleDrawer());}}
-            />
-          </Left>
+				<Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC", borderWidth: 0}}>
+          <Left></Left>
           <Body stle={{flex: 3}}>
-            <Text>Planner</Text>
+            <Text style={{color: "#FFFFFF"}}>Planner</Text>
           </Body>
-          <Right>
-            <Icon
-              style={{marginRight: 5}}
-              name={"add"}
-              size={30}
-              color="#298CFB"
-              onPress={()=>{this.props.navigation.navigate("CreatePlanner")}}
-            />
-          </Right>
+          <Right></Right>
         </Header>
 				<Agenda
 					items={this.state.items}
@@ -111,6 +187,19 @@ export default class Planner extends Component {
 					renderEmptyDate={this.renderEmptyDate.bind(this)}
 					rowHasChanged={this.rowHasChanged.bind(this)}
 				/>
+				<Footer style={{backgroundColor: "#1C75BC"}}>
+					<FooterTab style={{backgroundColor: "#1C75BC"}}>
+						<Button onPress={()=>{this.props.navigation.navigate("Groups")}}>
+							<Icon name="team" color="#FFFFFF" size={20}/>
+						</Button>
+						<Button onPress={()=>{this.props.navigation.navigate("Planner")}}>
+							<Icon name="bells" color="#2B3990" size={20}/>
+						</Button>
+						<Button onPress={()=>{this.props.navigation.navigate("Profile")}}>
+							<Icon name="user" color="#FFFFFF" size={20}/>
+						</Button>
+					</FooterTab>
+				</Footer>
       </Container>
     );
   }

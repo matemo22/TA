@@ -130,9 +130,9 @@ export default class Setting extends Component {
 						<Button onPress={()=>{this.props.navigation.navigate("Groups")}}>
 							<Icon name="team" color="#FFFFFF" size={20}/>
 						</Button>
-						<Button onPress={()=>{this.props.navigation.navigate("Planner")}}>
+						{/*<Button onPress={()=>{this.props.navigation.navigate("Planner")}}>
 							<Icon name="bells" color="#FFFFFF" size={20}/>
-						</Button>
+						</Button>*/}
 						<Button onPress={()=>{this.props.navigation.navigate("Profile")}}>
 							<Icon name="user" color="#2B3990" size={20}/>
 						</Button>

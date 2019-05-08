@@ -127,15 +127,13 @@ export default class Members extends Component {
             </Button>
           </Left>
           <Body stle={{flex: 3}}>
+            <Text style={{color: "#FFFFFF"}}>Members</Text>
           </Body>
           <Right>
           </Right>
         </Header>
         <Content bounces={false}>
           <List>
-            <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>
-              <Text>Members</Text>
-            </ListItem>
             <FlatList
               data={this.state.members}
               renderItem={this._renderItem}
