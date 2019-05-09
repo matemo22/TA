@@ -3,6 +3,7 @@ package com.ta;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactlibrary.RNReactNativeDocViewerPackage;
 import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
 import com.wix.autogrowtextinput.AutoGrowTextInputPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -35,6 +36,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNReactNativeDocViewerPackage(),
             new AutoGrowTextInputPackage(),
             new VectorIconsPackage(),
             new RNFirebasePackage(),

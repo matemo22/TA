@@ -101,6 +101,26 @@ class FirebaseSvc {
     });
 	}
 
+	deleteFile = (file, success_callback) => {
+		this.firestore.collection("storage").doc(file.id)
+    .delete()
+    .then(()=>{
+			var fileRef = this.storage.ref().child('storage/'+file.gid+'/'+file.fileName);
+			fileRef
+				.delete()
+				.then(() => {
+				  success_callback
+				})
+				.catch((error) => {
+					console.log("Storage - Error Delete File", error);
+				});
+		})
+		.catch((error) => {
+			console.log("Firestore - Error Delete File", error);
+    });
+
+	}
+
   createProfile = async (user, success_callback) => {
     var currUser = this.auth.currentUser;
     var ref = await this.firestore.collection('user').doc(currUser.uid);
