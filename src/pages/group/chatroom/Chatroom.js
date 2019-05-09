@@ -26,7 +26,6 @@ import { GiftedChat, Actions, Composer, SystemMessage, Send } from 'react-native
 import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import ImagePicker from 'react-native-image-picker';
 
 export default class Chatroom extends Component {
 
@@ -107,18 +106,6 @@ export default class Chatroom extends Component {
       </Send>
     );
   }
-
-  handleChoosePhoto = () => {
-		const options = {
-			noData: true,
-		};
-		ImagePicker.launchImageLibrary(options, response => {
-			if(response.uri) {
-				// let uploadUrl = FirebaseSvc.uploadAvatar(response);
-				this.setState({ sendImage: response });
-			}
-		});
-	}
 
   render() {
     // console.log("This", this);

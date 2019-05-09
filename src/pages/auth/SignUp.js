@@ -19,7 +19,6 @@ import {
 } from 'native-base';
 import { ImageEditor, } from 'react-native';
 import FirebaseSvc from '../../assets/services/FirebaseSvc';
-import ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
 
 export default class SignUp extends Component {

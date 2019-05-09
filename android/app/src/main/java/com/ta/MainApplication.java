@@ -4,7 +4,6 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
-import com.imagepicker.ImagePickerPackage;
 import com.wix.autogrowtextinput.AutoGrowTextInputPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import io.invertase.firebase.RNFirebasePackage;
@@ -36,7 +35,6 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new ImagePickerPackage(),
             new AutoGrowTextInputPackage(),
             new VectorIconsPackage(),
             new RNFirebasePackage(),

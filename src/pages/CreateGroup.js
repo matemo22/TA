@@ -18,9 +18,8 @@ import {
 	Thumbnail,
 	Toast,
 } from 'native-base';
-import { ImageEditor, } from 'react-native';
 import FirebaseSvc from '../assets/services/FirebaseSvc';
-import ImagePicker from 'react-native-image-picker';
+import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
@@ -58,13 +57,14 @@ export default class CreateGroup extends Component {
   onChangeTextName = (name) => {this.setState({name});}
 
   handleChoosePhoto = () => {
-		const options = {
-			noData: true,
-		};
-		ImagePicker.launchImageLibrary(options, response => {
-			if(response.uri) {
-				// let uploadUrl = FirebaseSvc.uploadAvatar(response);
-				this.setState({ avatar: response });
+		DocumentPicker.show({
+			filetype: [DocumentPickerUtil.images()],
+		},(error,res) => {
+			if(res) {
+				this.setState({avatar: res})
+			}
+			if(error) {
+				console.log("Error", error);
 			}
 		});
 	}
