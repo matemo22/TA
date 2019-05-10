@@ -127,12 +127,6 @@ export default class Chatroom extends Component {
             <Text style={{color: "#FFFFFF"}}>{this.parent.data.name}</Text>
           </Body>
           <Right>
-            <Button transparent>
-              <Icon color="#FFFFFF" name="folder1" size={20} />
-            </Button>
-            <Button transparent>
-              <Icon color="#FFFFFF" name="profile" size={20} />
-            </Button>
           </Right>
         </Header>
         <ListItem noIndent style={{backgroundColor: "#F8F8F8"}}>

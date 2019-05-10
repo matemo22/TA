@@ -426,12 +426,14 @@ export default class CreateEvent extends Component {
 	          onConfirm={this._handleDatePicked}
 	          onCancel={this._hideDateTimePicker}
 						mode="datetime"
+						minimumDate={new Date()}
 	        />
 					<DateTimePicker
 	          isVisible={this.state.isDateTimePickerVisible2}
 	          onConfirm={this._handleDatePicked2}
 	          onCancel={this._hideDateTimePicker2}
 						mode="datetime"
+						minimumDate={new Date()}
 						maximumDate={this.state.date}
 	        />
         </Content>

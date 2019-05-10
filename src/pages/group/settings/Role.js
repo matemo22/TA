@@ -105,13 +105,13 @@ export default class Role extends Component {
         <Header androidStatusBarColor="#1C75BC" style={{backgroundColor: "#1C75BC", borderBottomWidth: 0}}>
           <Left>
             <Button transparent>
-              <Icon
-                style={{marginLeft: 10}}
-                name={"left"}
-                size={25}
-                color="#FFFFFF"
-                onPress={()=>{this.props.navigation.goBack()}}
-              />
+							<Icon
+								style={{marginLeft: 10}}
+								name={"left"}
+								size={25}
+								color="#FFFFFF"
+								onPress={()=>{this.props.navigation.goBack()}}
+							/>
             </Button>
           </Left>
           <Body style={{flex: 3}}>

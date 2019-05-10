@@ -25,6 +25,7 @@ import {
 import FirebaseSvc from '../../../assets/services/FirebaseSvc';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
 
 export default class EditGroup extends Component {
   constructor(props){
@@ -41,11 +42,14 @@ export default class EditGroup extends Component {
   }
 
   handleChoosePhoto = () => {
-		const options = {noData: true,};
-		ImagePicker.launchImageLibrary(options, response => {
-			if(response.uri) {
-				// let uploadUrl = FirebaseSvc.uploadAvatar(response);
-				this.setState({ avatar: response, photoEdited: true,});
+		DocumentPicker.show({
+			filetype: [DocumentPickerUtil.allFiles()],
+		},(error,res) => {
+			if(res) {
+				this.setState({avatar: res, photoEdited: true});
+			}
+			if(error) {
+				console.log("Error", error);
 			}
 		});
 	}
